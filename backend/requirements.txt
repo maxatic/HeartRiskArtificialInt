@@ -3,4 +3,5 @@ kagglehub[pandas-datasets]
 scikit-learn
 pandas
 numpy
+joblib
 
