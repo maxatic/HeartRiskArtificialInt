@@ -1,4 +1,5 @@
 import { Heart, Activity, TrendingUp, Circle, Shield, Users, Lock, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const styles = `
   * {
@@ -412,6 +413,8 @@ const styles = `
 `
 
 function App() {
+  const navigate = useNavigate()
+
   return (
     <>
       <style>{styles}</style>
@@ -424,9 +427,9 @@ function App() {
               <span>CardioGuard Assistant</span>
             </div>
             <div className="nav-buttons">
-              <button className="btn btn-primary">Get Started</button>
-              <button className="btn btn-ghost">Login</button>
-              <button className="btn btn-secondary">Sign Up</button>
+              <button className="btn btn-primary" onClick={() => navigate('/auth')}>Get Started</button>
+              <button className="btn btn-ghost" onClick={() => navigate('/auth')}>Login</button>
+              <button className="btn btn-secondary" onClick={() => navigate('/auth')}>Sign Up</button>
             </div>
           </nav>
 
@@ -439,7 +442,7 @@ function App() {
               data-driven estimate of your heart attack risk — fast, simple, and easy to understand.
             </p>
             <div className="hero-buttons">
-              <button className="btn btn-primary">Start Free Assessment</button>
+              <button className="btn btn-primary" onClick={() => navigate('/auth')}>Start Free Assessment</button>
               <button className="btn btn-secondary">Learn More</button>
             </div>
             <div className="stats">
@@ -531,7 +534,7 @@ function App() {
           <section className="cta">
             <h2>Ready to Take Control of Your Heart Health?</h2>
             <p>Get your personalized risk assessment in just 5 minutes</p>
-            <button className="btn-cta">Calculate My Risk Now</button>
+            <button className="btn-cta" onClick={() => navigate('/auth')}>Calculate My Risk Now</button>
           </section>
 
           {/* Footer */}
