@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - CardioGuard Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 20px;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab-toggle {
+            display: flex;
+            background: #f3f4f6;
+            border-radius: 50px;
+            padding: 4px;
+            margin-bottom: 32px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        .role-label {
+            text-align: center;
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .role-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .role-card.selected {
+            border-color: #3b82f6;
+            background: #f8faff;
+        }
+
+        .role-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .role-icon.patient {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .role-icon.doctor {
+            background: #f3e8ff;
+            color: #8b5cf6;
+        }
+
+        .role-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .role-card p {
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        .selected-role {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+
+        .selected-role-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .selected-role-info svg {
+            color: #9ca3af;
+        }
+
+        .change-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .change-btn:hover {
+            text-decoration: underline;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #1a1a1a;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #1a1a2e;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            background: #2d2d44;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            color: #6b7280;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #3b82f6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Tab Toggle -->
+            <div class="tab-toggle">
+                <button class="tab-btn active" id="signin-tab" onclick="switchTab('signin')">Sign In</button>
+                <button class="tab-btn" id="signup-tab" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+
+            <!-- Header -->
+            <div class="auth-header">
+                <h1 id="auth-title">Welcome Back</h1>
+                <p id="auth-subtitle">Sign in to your account</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div id="role-selection">
+                <p class="role-label">I am a:</p>
+                <div class="role-selection">
+                    <div class="role-card" id="patient-card" onclick="selectRole('patient')">
+                        <div class="role-icon patient">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <h3>Patient</h3>
+                        <p>Get health assessments</p>
+                    </div>
+                    <div class="role-card" id="doctor-card" onclick="selectRole('doctor')">
+                        <div class="role-icon doctor">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+                        </div>
+                        <h3>Doctor</h3>
+                        <p>Manage patient care</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sign In Form -->
+            <form id="signin-form" style="display: none;" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="signin">
+                <input type="hidden" name="role" id="signin-role">
+                
+                <div class="selected-role">
+                    <div class="selected-role-info">
+                        <span id="signin-role-icon"></span>
+                        <span id="signin-role-text">Signing in as Patient</span>
+                    </div>
+                    <button type="button" class="change-btn" onclick="changeRole()">Change</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Sign In</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signup-form" style="display: none;" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="signup">
+                <input type="hidden" name="role" id="signup-role">
+                
+                <div class="selected-role">
+                    <div class="selected-role-info">
+                        <span id="signup-role-icon"></span>
+                        <span id="signup-role-text">Signing up as Patient</span>
+                    </div>
+                    <button type="button" class="change-btn" onclick="changeRole()">Change</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group" id="doctor-id-group">
+                    <label>Doctor ID (optional)</label>
+                    <input type="text" name="doctor_id" placeholder="Enter your doctor's ID">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Create a password" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" placeholder="Confirm your password" required>
+                </div>
+
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+
+            <!-- Back to Home -->
+            <a href="{% url 'home' %}" class="back-link">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'signin';
+        let selectedRole = null;
+
+        const patientIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        const doctorIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>';
+
+        function switchTab(tab) {
+            currentTab = tab;
+            selectedRole = null;
+            
+            // Update tab buttons
+            document.getElementById('signin-tab').classList.toggle('active', tab === 'signin');
+            document.getElementById('signup-tab').classList.toggle('active', tab === 'signup');
+            
+            // Update header
+            document.getElementById('auth-title').textContent = tab === 'signin' ? 'Welcome Back' : 'Create Account';
+            document.getElementById('auth-subtitle').textContent = tab === 'signin' ? 'Sign in to your account' : 'Join CardioGuard AI today';
+            
+            // Show role selection, hide forms
+            document.getElementById('role-selection').style.display = 'block';
+            document.getElementById('signin-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'none';
+            
+            // Reset role cards
+            document.getElementById('patient-card').classList.remove('selected');
+            document.getElementById('doctor-card').classList.remove('selected');
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // Update role cards visual
+            document.getElementById('patient-card').classList.toggle('selected', role === 'patient');
+            document.getElementById('doctor-card').classList.toggle('selected', role === 'doctor');
+            
+            // Hide role selection
+            document.getElementById('role-selection').style.display = 'none';
+            
+            // Update role info in forms
+            const roleText = role === 'patient' ? 'Patient' : 'Doctor';
+            const roleIcon = role === 'patient' ? patientIcon : doctorIcon;
+            
+            document.getElementById('signin-role').value = role;
+            document.getElementById('signin-role-icon').innerHTML = roleIcon;
+            document.getElementById('signin-role-text').textContent = 'Signing in as ' + roleText;
+            
+            document.getElementById('signup-role').value = role;
+            document.getElementById('signup-role-icon').innerHTML = roleIcon;
+            document.getElementById('signup-role-text').textContent = 'Signing up as ' + roleText;
+            
+            // Show/hide doctor ID field for patients only
+            document.getElementById('doctor-id-group').style.display = role === 'patient' ? 'block' : 'none';
+            
+            // Show appropriate form
+            if (currentTab === 'signin') {
+                document.getElementById('signin-form').style.display = 'block';
+            } else {
+                document.getElementById('signup-form').style.display = 'block';
+            }
+        }
+
+        function changeRole() {
+            selectedRole = null;
+            
+            // Show role selection, hide forms
+            document.getElementById('role-selection').style.display = 'block';
+            document.getElementById('signin-form').style.display = 'none';
+            document.getElementById('signup-form').style.display = 'none';
+            
+            // Reset role cards
+            document.getElementById('patient-card').classList.remove('selected');
+            document.getElementById('doctor-card').classList.remove('selected');
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioGuard Assistant - Heart Attack Risk Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        .page-wrapper {
+            background: #ffffff;
+            min-height: 100vh;
+        }
+        .main-container {
+            background: #ffffff;
+            overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #1a1a1a;
+        }
+        .logo svg {
+            color: #e53e3e;
+            fill: #e53e3e;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #333;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #1a1a1a;
+            border: 1px solid #e0e0e0;
+        }
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+        .btn-ghost {
+            background: transparent;
+            color: #666;
+        }
+        .btn-ghost:hover {
+            color: #1a1a1a;
+        }
+        .hero {
+            text-align: center;
+            padding: 80px 40px 60px;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #dc2626;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #0f0f0f;
+        }
+        .hero p {
+            font-size: 17px;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 180px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .how-it-works {
+            padding: 60px 40px 80px;
+            text-align: center;
+        }
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #0f0f0f;
+        }
+        .section-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 48px;
+        }
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .step-card {
+            background: #fff;
+            border: 1px solid #eaeaea;
+            border-radius: 16px;
+            padding: 40px 28px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .step-card:hover {
+            border-color: #d0d0d0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .step-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .step-icon.blue { background: #eff6ff; color: #3b82f6; }
+        .step-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+        .step-icon.green { background: #ecfdf5; color: #10b981; }
+        .step-card h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+        .step-card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .why-choose {
+            padding: 60px 40px 80px;
+            text-align: center;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px 80px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .feature {
+            display: flex;
+            gap: 16px;
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .feature-icon.red { background: #fef2f2; color: #ef4444; }
+        .feature-icon.blue { background: #eff6ff; color: #3b82f6; }
+        .feature-icon.cyan { background: #ecfeff; color: #06b6d4; }
+        .feature-icon.pink { background: #fdf2f8; color: #ec4899; }
+        .feature h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1a1a1a;
+        }
+        .feature p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .cta {
+            background: linear-gradient(135deg, #ef4444 0%, #7c3aed 50%, #3b82f6 100%);
+            margin: 0 24px 24px;
+            border-radius: 24px;
+            padding: 64px 40px;
+            text-align: center;
+        }
+        .cta h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .cta p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 28px;
+        }
+        .btn-cta {
+            background: white;
+            color: #1a1a1a;
+            padding: 14px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .footer {
+            background: #1a1a2e;
+            padding: 40px;
+            text-align: center;
+        }
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .footer-logo svg { color: #ef4444; fill: #ef4444; }
+        .footer-tagline {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+        }
+        .footer-disclaimer {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        @media (max-width: 768px) {
+            .nav { padding: 16px 20px; }
+            .hero { padding: 60px 20px 40px; }
+            .hero h1 { font-size: 32px; }
+            .stats { gap: 60px; }
+            .steps { grid-template-columns: 1fr; }
+            .features { grid-template-columns: 1fr; gap: 24px; }
+            .cta { margin: 0 12px 12px; padding: 48px 24px; }
+            .cta h2 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="main-container">
+            <nav class="nav">
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    <span>CardioGuard Assistant</span>
+                </div>
+                <div class="nav-buttons">
+                    <a href="{% url 'auth' %}" class="btn btn-primary">Get Started</a>
+                    <a href="{% url 'auth' %}" class="btn btn-ghost">Login</a>
+                    <a href="{% url 'auth' %}" class="btn btn-secondary">Sign Up</a>
+                </div>
+            </nav>
+
+            <section class="hero">
+                <div class="badge">Machine-Based Heart Attack Risk Assessment</div>
+                <h1>Understand Your Heart Attack Risk with an Advanced Machine Analysis</h1>
+                <p>Our machine-based system reviews your health information and provides a clear, data-driven estimate of your heart attack risk - fast, simple, and easy to understand.</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'auth' %}" class="btn btn-primary">Start Free Assessment</a>
+                    <a href="#how-it-works" class="btn btn-secondary">Learn More</a>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Prediction Accuracy</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">Available Anytime</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="how-it-works" id="how-it-works">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Simple, fast, and accurate health risk assessment</p>
+                <div class="steps">
+                    <div class="step-card">
+                        <div class="step-icon blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <h3>Enter Health Data</h3>
+                        <p>Input your health parameters including blood pressure, cholesterol, and other vital signs.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon purple">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                        </div>
+                        <h3>Machine Analysis</h3>
+                        <p>Our machine system processes your inputs and calculates your heart attack risk using validated medical data.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon green">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                        </div>
+                        <h3>View Your Risk Score</h3>
+                        <p>See a clear breakdown of your risk level in just a few seconds.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="why-choose">
+                <h2 class="section-title">Why Choose CardioGuard Assistant</h2>
+                <p class="section-subtitle">Advanced technology meets healthcare expertise</p>
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon red">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                        </div>
+                        <div>
+                            <h4>Clinically Validated</h4>
+                            <p>Our model is trained on extensive medical datasets and validated by healthcare professionals</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
+                        <div>
+                            <h4>Trusted by Thousands</h4>
+                            <p>Join thousands of users who trust CardioGuard AI for their health monitoring</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon cyan">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </div>
+                        <div>
+                            <h4>Privacy Protected</h4>
+                            <p>Your health data is encrypted and never shared with third parties</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon pink">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        </div>
+                        <div>
+                            <h4>Fast & Simple</h4>
+                            <p>Get your risk score in minutes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cta">
+                <h2>Ready to Take Control of Your Heart Health?</h2>
+                <p>Get your personalized risk assessment in just 5 minutes</p>
+                <a href="{% url 'auth' %}" class="btn-cta">Calculate My Risk Now</a>
+            </section>
+
+            <footer class="footer">
+                <div class="footer-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    <span>CardioGuard Assistant</span>
+                </div>
+                <p class="footer-tagline">Advanced machine-driven heart attack risk prediction</p>
+                <p class="footer-disclaimer">2025 CardioGuard AI. For educational purposes only. Not a substitute for professional medical advice.</p>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
+
