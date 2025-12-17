@@ -59,7 +59,6 @@ def train_model(test_size=0.2, random_state=42):
     # Evaluate
     y_pred = model.predict(X_test_scaled)
     accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred, target_names=['Negative', 'Positive'])
     
     print(f"\nAccuracy: {accuracy:.4f}")
     
