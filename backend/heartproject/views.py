@@ -19,6 +19,28 @@ def home(request):
     return render(request, 'home.html')
 
 
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import redirect
+
 def auth(request):
     """Render the authentication page (sign in / sign up)."""
+    if request.method == 'POST' and request.POST.get('form_type') == 'signup':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        # Simple validation
+        if User.objects.filter(username=email).exists():
+            messages.error(request, 'User with this email already exists.')
+            return render(request, 'auth.html')
+
+        # Create user (using email as username)
+        try:
+            user = User.objects.create_user(username=email, email=email, password=password) #Django's default User model requires a username. It's a mandatory field in the database.
+            user.save()
+            messages.success(request, 'Account created successfully! Please sign in.')
+            return redirect('auth')
+        except Exception as e:
+            messages.error(request, f'Error creating account: {str(e)}')
+            
     return render(request, 'auth.html')

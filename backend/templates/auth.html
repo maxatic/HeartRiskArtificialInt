@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - CardioGuard Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -250,17 +252,18 @@
         }
     </style>
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-card">
             <!-- Tab Toggle -->
-            <div class="tab-toggle">
+            <div class="tab-toggle" id="tab-toggle-container">
                 <button class="tab-btn active" id="signin-tab" onclick="switchTab('signin')">Sign In</button>
                 <button class="tab-btn" id="signup-tab" onclick="switchTab('signup')">Sign Up</button>
             </div>
 
             <!-- Header -->
-            <div class="auth-header">
+            <div class="auth-header" id="auth-header-container">
                 <h1 id="auth-title">Welcome Back</h1>
                 <p id="auth-subtitle">Sign in to your account</p>
             </div>
@@ -271,14 +274,28 @@
                 <div class="role-selection">
                     <div class="role-card" id="patient-card" onclick="selectRole('patient')">
                         <div class="role-icon patient">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
                         </div>
                         <h3>Patient</h3>
                         <p>Get health assessments</p>
                     </div>
                     <div class="role-card" id="doctor-card" onclick="selectRole('doctor')">
                         <div class="role-icon doctor">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="m18 2 4 4" />
+                                <path d="m17 7 3-3" />
+                                <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+                                <path d="m9 11 4 4" />
+                                <path d="m5 19-3 3" />
+                                <path d="m14 4 6 6" />
+                            </svg>
                         </div>
                         <h3>Doctor</h3>
                         <p>Manage patient care</p>
@@ -287,11 +304,11 @@
             </div>
 
             <!-- Sign In Form -->
-            <form id="signin-form" style="display: none;" method="post">
+            <form id="signin-form" style="display: none;" onsubmit="handleLogin(event)">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="signin">
                 <input type="hidden" name="role" id="signin-role">
-                
+
                 <div class="selected-role">
                     <div class="selected-role-info">
                         <span id="signin-role-icon"></span>
@@ -302,7 +319,8 @@
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" placeholder="Enter your email" required>
+                    <input type="text" name="username" placeholder="Enter your username" required>
+                    <!-- Changed to text/username as SimpleJWT uses username by default usually, but we'll check views -->
                 </div>
 
                 <div class="form-group">
@@ -310,15 +328,15 @@
                     <input type="password" name="password" placeholder="Enter your password" required>
                 </div>
 
-                <button type="submit" class="submit-btn">Sign In</button>
+                <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
             </form>
 
-            <!-- Sign Up Form -->
+            <!-- Sign Up Form (Unchanged for now, keeping standard submit) -->
             <form id="signup-form" style="display: none;" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="signup">
                 <input type="hidden" name="role" id="signup-role">
-                
+
                 <div class="selected-role">
                     <div class="selected-role-info">
                         <span id="signup-role-icon"></span>
@@ -327,10 +345,6 @@
                     <button type="button" class="change-btn" onclick="changeRole()">Change</button>
                 </div>
 
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" name="full_name" placeholder="Enter your full name" required>
-                </div>
 
                 <div class="form-group">
                     <label>Email</label>
@@ -356,7 +370,7 @@
             </form>
 
             <!-- Back to Home -->
-            <a href="{% url 'home' %}" class="back-link">← Back to Home</a>
+            <a href="{% url 'home' %}" class="back-link" id="back-link">← Back to Home</a>
         </div>
     </div>
 
@@ -370,20 +384,20 @@
         function switchTab(tab) {
             currentTab = tab;
             selectedRole = null;
-            
+
             // Update tab buttons
             document.getElementById('signin-tab').classList.toggle('active', tab === 'signin');
             document.getElementById('signup-tab').classList.toggle('active', tab === 'signup');
-            
+
             // Update header
             document.getElementById('auth-title').textContent = tab === 'signin' ? 'Welcome Back' : 'Create Account';
             document.getElementById('auth-subtitle').textContent = tab === 'signin' ? 'Sign in to your account' : 'Join CardioGuard AI today';
-            
+
             // Show role selection, hide forms
             document.getElementById('role-selection').style.display = 'block';
             document.getElementById('signin-form').style.display = 'none';
             document.getElementById('signup-form').style.display = 'none';
-            
+
             // Reset role cards
             document.getElementById('patient-card').classList.remove('selected');
             document.getElementById('doctor-card').classList.remove('selected');
@@ -391,29 +405,29 @@
 
         function selectRole(role) {
             selectedRole = role;
-            
+
             // Update role cards visual
             document.getElementById('patient-card').classList.toggle('selected', role === 'patient');
             document.getElementById('doctor-card').classList.toggle('selected', role === 'doctor');
-            
+
             // Hide role selection
             document.getElementById('role-selection').style.display = 'none';
-            
+
             // Update role info in forms
             const roleText = role === 'patient' ? 'Patient' : 'Doctor';
             const roleIcon = role === 'patient' ? patientIcon : doctorIcon;
-            
+
             document.getElementById('signin-role').value = role;
             document.getElementById('signin-role-icon').innerHTML = roleIcon;
             document.getElementById('signin-role-text').textContent = 'Signing in as ' + roleText;
-            
+
             document.getElementById('signup-role').value = role;
             document.getElementById('signup-role-icon').innerHTML = roleIcon;
             document.getElementById('signup-role-text').textContent = 'Signing up as ' + roleText;
-            
+
             // Show/hide doctor ID field for patients only
             document.getElementById('doctor-id-group').style.display = role === 'patient' ? 'block' : 'none';
-            
+
             // Show appropriate form
             if (currentTab === 'signin') {
                 document.getElementById('signin-form').style.display = 'block';
@@ -424,17 +438,62 @@
 
         function changeRole() {
             selectedRole = null;
-            
+
             // Show role selection, hide forms
             document.getElementById('role-selection').style.display = 'block';
             document.getElementById('signin-form').style.display = 'none';
             document.getElementById('signup-form').style.display = 'none';
-            
+
             // Reset role cards
             document.getElementById('patient-card').classList.remove('selected');
             document.getElementById('doctor-card').classList.remove('selected');
         }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Signing in...';
+            btn.disabled = true;
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: data.username,
+                        password: data.password
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // SAVE TOKENS TO LOCAL STORAGE
+                    localStorage.setItem('accessToken', result.access);
+                    localStorage.setItem('refreshToken', result.refresh);
+
+                    // Redirect to home page
+                    window.location.href = "{% url 'home' %}";
+                } else {
+                    alert('Login failed. Please check your credentials.');
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during login.');
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
     </script>
 </body>
-</html>
 
+</html>
