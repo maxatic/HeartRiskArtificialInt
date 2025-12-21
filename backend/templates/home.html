@@ -1,32 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CardioGuard Assistant - Heart Attack Risk Assessment</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #ffffff;
             color: #1a1a1a;
             line-height: 1.6;
         }
+
         .page-wrapper {
             background: #ffffff;
             min-height: 100vh;
         }
+
         .main-container {
             background: #ffffff;
             overflow: hidden;
             max-width: 1400px;
             margin: 0 auto;
         }
+
         .nav {
             display: flex;
             justify-content: space-between;
@@ -34,6 +40,7 @@
             padding: 16px 40px;
             border-bottom: 1px solid #f0f0f0;
         }
+
         .logo {
             display: flex;
             align-items: center;
@@ -42,15 +49,18 @@
             font-size: 18px;
             color: #1a1a1a;
         }
+
         .logo svg {
             color: #e53e3e;
             fill: #e53e3e;
         }
+
         .nav-buttons {
             display: flex;
             gap: 8px;
             align-items: center;
         }
+
         .btn {
             padding: 10px 20px;
             border-radius: 8px;
@@ -63,32 +73,40 @@
             text-decoration: none;
             display: inline-block;
         }
+
         .btn-primary {
             background: #1a1a1a;
             color: white;
         }
+
         .btn-primary:hover {
             background: #333;
         }
+
         .btn-secondary {
             background: transparent;
             color: #1a1a1a;
             border: 1px solid #e0e0e0;
         }
+
         .btn-secondary:hover {
             background: #f5f5f5;
         }
+
         .btn-ghost {
             background: transparent;
             color: #666;
         }
+
         .btn-ghost:hover {
             color: #1a1a1a;
         }
+
         .hero {
             text-align: center;
             padding: 80px 40px 60px;
         }
+
         .badge {
             display: inline-block;
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
@@ -99,6 +117,7 @@
             font-weight: 600;
             margin-bottom: 24px;
         }
+
         .hero h1 {
             font-size: 48px;
             font-weight: 700;
@@ -109,6 +128,7 @@
             margin-right: auto;
             color: #0f0f0f;
         }
+
         .hero p {
             font-size: 17px;
             color: #666;
@@ -116,45 +136,54 @@
             margin: 0 auto 32px;
             line-height: 1.7;
         }
+
         .hero-buttons {
             display: flex;
             gap: 12px;
             justify-content: center;
             margin-bottom: 60px;
         }
+
         .stats {
             display: flex;
             justify-content: center;
             gap: 180px;
         }
+
         .stat {
             text-align: center;
         }
+
         .stat-value {
             font-size: 36px;
             font-weight: 700;
             color: #1a1a1a;
         }
+
         .stat-label {
             font-size: 14px;
             color: #888;
             margin-top: 4px;
         }
+
         .how-it-works {
             padding: 60px 40px 80px;
             text-align: center;
         }
+
         .section-title {
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 12px;
             color: #0f0f0f;
         }
+
         .section-subtitle {
             font-size: 16px;
             color: #666;
             margin-bottom: 48px;
         }
+
         .steps {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -162,6 +191,7 @@
             max-width: 900px;
             margin: 0 auto;
         }
+
         .step-card {
             background: #fff;
             border: 1px solid #eaeaea;
@@ -170,10 +200,12 @@
             text-align: center;
             transition: all 0.2s ease;
         }
+
         .step-card:hover {
             border-color: #d0d0d0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
         }
+
         .step-icon {
             width: 56px;
             height: 56px;
@@ -183,60 +215,37 @@
             justify-content: center;
             margin: 0 auto 20px;
         }
-        .step-icon.blue { background: #eff6ff; color: #3b82f6; }
-        .step-icon.purple { background: #f5f3ff; color: #8b5cf6; }
-        .step-icon.green { background: #ecfdf5; color: #10b981; }
+
+        .step-icon.blue {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .step-icon.purple {
+            background: #f5f3ff;
+            color: #8b5cf6;
+        }
+
+        .step-icon.green {
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
         .step-card h3 {
             font-size: 17px;
             font-weight: 600;
             margin-bottom: 12px;
             color: #1a1a1a;
         }
+
         .step-card p {
             font-size: 14px;
             color: #666;
             line-height: 1.6;
         }
-        .why-choose {
-            padding: 60px 40px 80px;
-            text-align: center;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 32px 80px;
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
-        }
-        .feature {
-            display: flex;
-            gap: 16px;
-        }
-        .feature-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .feature-icon.red { background: #fef2f2; color: #ef4444; }
-        .feature-icon.blue { background: #eff6ff; color: #3b82f6; }
-        .feature-icon.cyan { background: #ecfeff; color: #06b6d4; }
-        .feature-icon.pink { background: #fdf2f8; color: #ec4899; }
-        .feature h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #1a1a1a;
-        }
-        .feature p {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-        }
+
+
+
         .cta {
             background: linear-gradient(135deg, #ef4444 0%, #7c3aed 50%, #3b82f6 100%);
             margin: 0 24px 24px;
@@ -244,17 +253,20 @@
             padding: 64px 40px;
             text-align: center;
         }
+
         .cta h2 {
             font-size: 32px;
             font-weight: 700;
             color: white;
             margin-bottom: 12px;
         }
+
         .cta p {
             font-size: 16px;
-            color: rgba(255,255,255,0.9);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 28px;
         }
+
         .btn-cta {
             background: white;
             color: #1a1a1a;
@@ -269,15 +281,18 @@
             text-decoration: none;
             display: inline-block;
         }
+
         .btn-cta:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
+
         .footer {
             background: #1a1a2e;
             padding: 40px;
             text-align: center;
         }
+
         .footer-logo {
             display: flex;
             align-items: center;
@@ -288,47 +303,83 @@
             color: white;
             margin-bottom: 8px;
         }
-        .footer-logo svg { color: #ef4444; fill: #ef4444; }
+
+        .footer-logo svg {
+            color: #ef4444;
+            fill: #ef4444;
+        }
+
         .footer-tagline {
             font-size: 14px;
             color: #9ca3af;
             margin-bottom: 16px;
         }
+
         .footer-disclaimer {
             font-size: 12px;
             color: #6b7280;
         }
+
         @media (max-width: 768px) {
-            .nav { padding: 16px 20px; }
-            .hero { padding: 60px 20px 40px; }
-            .hero h1 { font-size: 32px; }
-            .stats { gap: 60px; }
-            .steps { grid-template-columns: 1fr; }
-            .features { grid-template-columns: 1fr; gap: 24px; }
-            .cta { margin: 0 12px 12px; padding: 48px 24px; }
-            .cta h2 { font-size: 24px; }
+            .nav {
+                padding: 16px 20px;
+            }
+
+            .hero {
+                padding: 60px 20px 40px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .stats {
+                gap: 60px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .cta {
+                margin: 0 12px 12px;
+                padding: 48px 24px;
+            }
+
+            .cta h2 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="page-wrapper">
         <div class="main-container">
             <nav class="nav">
                 <div class="logo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#e53e3e" stroke="#e53e3e" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#e53e3e"
+                        stroke="#e53e3e" stroke-width="2">
+                        <path
+                            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
                     <span>CardioGuard Assistant</span>
                 </div>
                 <div class="nav-buttons">
-                    <a href="{% url 'auth' %}" class="btn btn-primary">Get Started</a>
-                    <a href="{% url 'auth' %}" class="btn btn-ghost">Login</a>
-                    <a href="{% url 'auth' %}" class="btn btn-secondary">Sign Up</a>
+                    <a href="{% url 'auth' %}" class="btn btn-secondary">Login / Sign Up</a>
                 </div>
             </nav>
 
             <section class="hero">
-                <div class="badge">Machine-Based Heart Attack Risk Assessment</div>
+                <div class="badge">AI-Powered Heart Attack Risk Assessment</div>
                 <h1>Understand Your Heart Attack Risk with an Advanced Machine Analysis</h1>
-                <p>Our machine-based system reviews your health information and provides a clear, data-driven estimate of your heart attack risk - fast, simple, and easy to understand.</p>
+                <p>Our machine-based system reviews your health information and provides a clear, data-driven estimate
+                    of your heart attack risk - fast, simple, and easy to understand.</p>
                 <div class="hero-buttons">
                     <a href="{% url 'auth' %}" class="btn btn-primary">Start Free Assessment</a>
                     <a href="#how-it-works" class="btn btn-secondary">Learn More</a>
@@ -339,6 +390,10 @@
                         <div class="stat-label">Prediction Accuracy</div>
                     </div>
                     <div class="stat">
+                        <div class="stat-value">&lt;30 sec</div>
+                        <div class="stat-label">Instant Results</div>
+                    </div>
+                    <div class="stat">
                         <div class="stat-value">24/7</div>
                         <div class="stat-label">Available Anytime</div>
                     </div>
@@ -346,75 +401,232 @@
             </section>
 
             <section class="how-it-works" id="how-it-works">
+                <style>
+                    .how-it-works {
+                        background: linear-gradient(to bottom, #ffffff, #fafafa);
+                        padding: 100px 40px;
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .how-it-works .section-title {
+                        margin-bottom: 20px;
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    .how-it-works .section-subtitle {
+                        margin-bottom: 70px;
+                        position: relative;
+                        z-index: 2;
+                    }
+
+                    .steps-container {
+                        max-width: 1100px;
+                        margin: 0 auto;
+                        position: relative;
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 40px;
+                    }
+
+                    /* Connecting Line */
+                    .steps-container::before {
+                        content: '';
+                        position: absolute;
+                        top: 50px;
+                        left: 10%;
+                        right: 10%;
+                        height: 2px;
+                        background: repeating-linear-gradient(to right, #e5e7eb 0, #e5e7eb 10px, transparent 10px, transparent 20px);
+                        z-index: 0;
+                    }
+
+                    .step-card-modern {
+                        background: #fff;
+                        border-radius: 24px;
+                        padding: 40px 30px;
+                        text-align: center;
+                        position: relative;
+                        z-index: 1;
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        border: 1px solid rgba(0, 0, 0, 0.04);
+                        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+                    }
+
+                    .step-card-modern:hover {
+                        transform: translateY(-10px);
+                        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+                        border-color: rgba(0, 0, 0, 0.08);
+                    }
+
+                    .step-icon-modern {
+                        width: 80px;
+                        height: 80px;
+                        border-radius: 20px;
+                        margin: 0 auto 30px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 32px;
+                        position: relative;
+                        background: white;
+                        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+                    }
+
+                    /* Gradient Backgrounds for Icons */
+                    .icon-bg-blue {
+                        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                        color: #3b82f6;
+                    }
+
+                    .icon-bg-purple {
+                        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+                        color: #8b5cf6;
+                    }
+
+                    .icon-bg-green {
+                        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+                        color: #10b981;
+                    }
+
+                    .step-number {
+                        position: absolute;
+                        top: -20px;
+                        right: 20px;
+                        font-size: 80px;
+                        font-weight: 800;
+                        line-height: 1;
+                        pointer-events: none;
+                        transition: all 0.3s ease;
+                        opacity: 0.1;
+                    }
+
+                    /* Color Themes with Backgrounds */
+                    .theme-blue {
+                        background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+                        border-bottom: 4px solid #3b82f6;
+                    }
+
+                    .theme-blue .step-number {
+                        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        opacity: 0.2;
+                    }
+
+                    .theme-purple {
+                        background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+                        border-bottom: 4px solid #8b5cf6;
+                    }
+
+                    .theme-purple .step-number {
+                        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        opacity: 0.2;
+                    }
+
+                    .theme-green {
+                        background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
+                        border-bottom: 4px solid #10b981;
+                    }
+
+                    .theme-green .step-number {
+                        background: linear-gradient(135deg, #10b981, #34d399);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        opacity: 0.2;
+                    }
+
+                    .step-card-modern:hover .step-number {
+                        opacity: 0.4;
+                        transform: scale(1.1);
+                    }
+
+                    .step-card-modern h3 {
+                        font-size: 19px;
+                        font-weight: 700;
+                        margin-bottom: 15px;
+                        color: #1a1a1a;
+                    }
+
+                    .step-card-modern p {
+                        font-size: 15px;
+                        color: #666;
+                        line-height: 1.6;
+                        margin-bottom: 0;
+                    }
+
+                    @media (max-width: 900px) {
+                        .steps-container {
+                            grid-template-columns: 1fr;
+                            gap: 30px;
+                        }
+
+                        .steps-container::before {
+                            display: none;
+                        }
+                    }
+                </style>
+
                 <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Simple, fast, and accurate health risk assessment</p>
-                <div class="steps">
-                    <div class="step-card">
-                        <div class="step-icon blue">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <p class="section-subtitle">Get your heart health analysis in 3 simple steps</p>
+
+                <div class="steps-container">
+                    <!-- Step 1 -->
+                    <div class="step-card-modern">
+                        <div class="step-number">01</div>
+                        <div class="step-icon-modern icon-bg-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                </path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                <path d="M9 14h6"></path>
+                                <path d="M9 10h6"></path>
+                                <path d="M9 18h6"></path>
+                            </svg>
                         </div>
                         <h3>Enter Health Data</h3>
-                        <p>Input your health parameters including blood pressure, cholesterol, and other vital signs.</p>
+                        <p>Fill in a secure form with your vital signs like blood pressure and cholesterol levels.</p>
                     </div>
-                    <div class="step-card">
-                        <div class="step-icon purple">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+
+                    <!-- Step 2 -->
+                    <div class="step-card-modern">
+                        <div class="step-number">02</div>
+                        <div class="step-icon-modern icon-bg-purple">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                            </svg>
                         </div>
-                        <h3>Machine Analysis</h3>
-                        <p>Our machine system processes your inputs and calculates your heart attack risk using validated medical data.</p>
+                        <h3>AI Analysis</h3>
+                        <p>Our advanced machine learning model instantly processes your data against clinical patterns.
+                        </p>
                     </div>
-                    <div class="step-card">
-                        <div class="step-icon green">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+
+                    <!-- Step 3 -->
+                    <div class="step-card-modern">
+                        <div class="step-number">03</div>
+                        <div class="step-icon-modern icon-bg-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
                         </div>
-                        <h3>View Your Risk Score</h3>
-                        <p>See a clear breakdown of your risk level in just a few seconds.</p>
+                        <h3>Instant Results</h3>
+                        <p>Receive a clear risk assessment score and personalized recommendations immediately.</p>
                     </div>
                 </div>
             </section>
 
-            <section class="why-choose">
-                <h2 class="section-title">Why Choose CardioGuard Assistant</h2>
-                <p class="section-subtitle">Advanced technology meets healthcare expertise</p>
-                <div class="features">
-                    <div class="feature">
-                        <div class="feature-icon red">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                        </div>
-                        <div>
-                            <h4>Clinically Validated</h4>
-                            <p>Our model is trained on extensive medical datasets and validated by healthcare professionals</p>
-                        </div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon blue">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        </div>
-                        <div>
-                            <h4>Trusted by Thousands</h4>
-                            <p>Join thousands of users who trust CardioGuard AI for their health monitoring</p>
-                        </div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon cyan">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </div>
-                        <div>
-                            <h4>Privacy Protected</h4>
-                            <p>Your health data is encrypted and never shared with third parties</p>
-                        </div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon pink">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                        </div>
-                        <div>
-                            <h4>Fast & Simple</h4>
-                            <p>Get your risk score in minutes.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+
 
             <section class="cta">
                 <h2>Ready to Take Control of Your Heart Health?</h2>
@@ -424,14 +636,19 @@
 
             <footer class="footer">
                 <div class="footer-logo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#ef4444"
+                        stroke="#ef4444" stroke-width="2">
+                        <path
+                            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
                     <span>CardioGuard Assistant</span>
                 </div>
                 <p class="footer-tagline">Advanced machine-driven heart attack risk prediction</p>
-                <p class="footer-disclaimer">2025 CardioGuard AI. For educational purposes only. Not a substitute for professional medical advice.</p>
+                <p class="footer-disclaimer">2025 CardioGuard AI. For educational purposes only. Not a substitute for
+                    professional medical advice.</p>
             </footer>
         </div>
     </div>
 </body>
-</html>
 
+</html>
