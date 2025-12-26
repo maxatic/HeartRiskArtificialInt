@@ -291,6 +291,8 @@
             background: #1a1a2e;
             padding: 40px;
             text-align: center;
+            border-radius: 24px 24px 0 0;
+            margin: 0 24px 0;
         }
 
         .footer-logo {
@@ -318,6 +320,22 @@
         .footer-disclaimer {
             font-size: 12px;
             color: #6b7280;
+        }
+
+        .footer-links {
+            margin-bottom: 24px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -630,7 +648,7 @@
 
             <section class="cta">
                 <h2>Ready to Take Control of Your Heart Health?</h2>
-                <p>Get your personalized risk assessment in just 5 minutes</p>
+                <p>Get your personalized risk assessment in less than a minute</p>
                 <a href="{% url 'auth' %}" class="btn-cta">Calculate My Risk Now</a>
             </section>
 
@@ -643,9 +661,17 @@
                     </svg>
                     <span>CardioGuard Assistant</span>
                 </div>
-                <p class="footer-tagline">Advanced machine-driven heart attack risk prediction</p>
-                <p class="footer-disclaimer">2025 CardioGuard AI. For educational purposes only. Not a substitute for
-                    professional medical advice.</p>
+                <p class="footer-tagline">AI-Powered Heart Attack Risk Assessment</p>
+                <div class="footer-links">
+                    <a href="{% url 'auth' %}">Risk Assessment</a>
+                    &middot;
+                    <a href="#how-it-works">How it works</a>
+                    &middot;
+                    <a href="mailto:support@cardioguard.ai">support@cardioguard.ai</a>
+
+                </div>
+                <p class="footer-disclaimer">2025 CardioGuard AI. For educational purposes only. This tool does not
+                    provide medical diagnosis. Always consult a qualified healthcare professional.</p>
             </footer>
         </div>
     </div>
