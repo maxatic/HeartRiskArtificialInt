@@ -244,7 +244,67 @@
             line-height: 1.6;
         }
 
+        .why-choose {
+            padding: 60px 40px 80px;
+            text-align: center;
+        }
 
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px 80px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            gap: 16px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon.red {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .feature-icon.blue {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .feature-icon.cyan {
+            background: #ecfeff;
+            color: #06b6d4;
+        }
+
+        .feature-icon.pink {
+            background: #fdf2f8;
+            color: #ec4899;
+        }
+
+        .feature h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1a1a1a;
+        }
+
+        .feature p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
 
         .cta {
             background: linear-gradient(135deg, #ef4444 0%, #7c3aed 50%, #3b82f6 100%);
@@ -589,53 +649,36 @@
                 </style>
 
                 <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Get your heart health analysis in 3 simple steps</p>
-
-                <div class="steps-container">
-                    <!-- Step 1 -->
-                    <div class="step-card-modern">
-                        <div class="step-number">01</div>
-                        <div class="step-icon-modern icon-bg-blue">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                </path>
-                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                                <path d="M9 14h6"></path>
-                                <path d="M9 10h6"></path>
-                                <path d="M9 18h6"></path>
+                <p class="section-subtitle">Simple, fast, and accurate health risk assessment</p>
+                <div class="steps">
+                    <div class="step-card">
+                        <div class="step-icon blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                             </svg>
                         </div>
                         <h3>Enter Health Data</h3>
-                        <p>Fill in a secure form with your vital signs like blood pressure and cholesterol levels.</p>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="step-card-modern">
-                        <div class="step-number">02</div>
-                        <div class="step-icon-modern icon-bg-purple">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-                                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-                            </svg>
-                        </div>
-                        <h3>AI Analysis</h3>
-                        <p>Our advanced machine learning model instantly processes your data against clinical patterns.
+                        <p>Input your health parameters including blood pressure, cholesterol, and other vital signs.
                         </p>
                     </div>
-
-                    <!-- Step 3 -->
-                    <div class="step-card-modern">
-                        <div class="step-number">03</div>
-                        <div class="step-icon-modern icon-bg-green">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    <div class="step-card">
+                        <div class="step-icon purple">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                                <polyline points="16 7 22 7 22 13" />
+                            </svg>
+                        </div>
+                        <h3>Machine Analysis</h3>
+                        <p>Our machine system processes your inputs and calculates your heart attack risk using
+                            validated medical data.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon green">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
                             </svg>
                         </div>
                         <h3>Instant Results</h3>
@@ -644,7 +687,65 @@
                 </div>
             </section>
 
-
+            <section class="why-choose">
+                <h2 class="section-title">Why Choose CardioGuard Assistant</h2>
+                <p class="section-subtitle">Advanced technology meets healthcare expertise</p>
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon red">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Clinically Validated</h4>
+                            <p>Our model is trained on extensive medical datasets and validated by healthcare
+                                professionals</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Trusted by Thousands</h4>
+                            <p>Join thousands of users who trust CardioGuard AI for their health monitoring</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon cyan">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Privacy Protected</h4>
+                            <p>Your health data is encrypted and never shared with third parties</p>
+                        </div>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon pink">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Fast & Simple</h4>
+                            <p>Get your risk score in minutes.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <section class="cta">
                 <h2>Ready to Take Control of Your Heart Health?</h2>
@@ -675,6 +776,70 @@
             </footer>
         </div>
     </div>
+    <script>
+        // BACKGROUND TOKEN MANAGEMENT
+        const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes (tokens last 15 mins)
+
+        function checkLoginState() {
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+
+            if (accessToken && refreshToken) {
+                updateNavForLoggedInUser();
+                scheduleTokenRefresh();
+            }
+        }
+
+        function updateNavForLoggedInUser() {
+            const navButtons = document.querySelector('.nav-buttons');
+            navButtons.innerHTML = `
+                <a href="#" class="btn btn-primary">Dashboard</a>
+                <button onclick="logout()" class="btn btn-secondary" style="border: 1px solid #e0e0e0; background: transparent;">Logout</button>
+            `;
+        }
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = "{% url 'auth' %}";
+        }
+
+        async function refreshAccessToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) return;
+
+            try {
+                const response = await fetch('/api/token/refresh/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    localStorage.setItem('accessToken', result.access);
+                    console.log('Token automatically refreshed at ' + new Date().toLocaleTimeString());
+                } else {
+                    console.warn('Token refresh failed. Logging out.');
+                    logout();
+                }
+            } catch (error) {
+                console.error('Error refreshing token:', error);
+            }
+        }
+
+        function scheduleTokenRefresh() {
+            // Initial refresh check
+            refreshAccessToken();
+            // Schedule periodic refreshes
+            setInterval(refreshAccessToken, REFRESH_INTERVAL);
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', checkLoginState);
+    </script>
 </body>
 
 </html>
