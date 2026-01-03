@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Assessment - CardioGuard Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .page-wrapper {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: #ffffff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+
+        .logo svg {
+            color: #e53e3e;
+            fill: #e53e3e;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .content-wrapper {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a1a1a;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 32px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .page-title svg {
+            color: #ef4444;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .assessment-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-family: inherit;
+            font-size: 15px;
+            color: #1a1a1a;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .field-hint {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .submit-btn {
+            background: #0f172a;
+            color: #ffffff;
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            border: none;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .submit-btn:hover {
+            background: #1e293b;
+        }
+        
+        .submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Result Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .risk-score {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #ef4444 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #475569;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <nav class="nav">
+            <a href="{% url 'home' %}" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#e53e3e"
+                    stroke="#e53e3e" stroke-width="2">
+                    <path
+                        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+                <span>CardioGuard Assistant</span>
+            </a>
+            <div class="nav-buttons">
+                <!-- User name or logout will be injected here -->
+            </div>
+        </nav>
+
+        <div class="content-wrapper">
+            <a href="{% url 'home' %}" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back to Home
+            </a>
+
+            <div class="page-header">
+                <h1 class="page-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                        <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z" />
+                    </svg>
+                    Health Assessment
+                </h1>
+                <p class="page-subtitle">Please provide accurate information for the most reliable risk prediction</p>
+            </div>
+
+            <div class="assessment-card">
+                <form id="riskForm" onsubmit="handlePredictById(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Age *</label>
+                            <input type="number" name="age" placeholder="45" required>
+                            <div class="field-hint">Years</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gender *</label>
+                            <select name="gender" required>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Heart Rate *</label>
+                            <input type="number" name="heart_rate" placeholder="72" required>
+                            <div class="field-hint">Beats per minute (Normal: 60-100 bpm)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Systolic Blood Pressure *</label>
+                            <input type="number" name="systolic_bp" placeholder="120" required>
+                            <div class="field-hint">Top number (Normal: under 120 mmHg)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Diastolic Blood Pressure *</label>
+                            <input type="number" name="diastolic_bp" placeholder="80" required>
+                            <div class="field-hint">Bottom number (Normal: under 80 mmHg)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Blood Sugar *</label>
+                            <input type="number" name="blood_sugar" placeholder="95" required>
+                            <div class="field-hint">Fasting glucose (Normal: 70-100 mg/dL)</div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>CK-MB (optional)</label>
+                            <input type="number" step="0.01" name="ck_mb" placeholder="0.00">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Troponin (optional)</label>
+                            <input type="number" step="0.001" name="troponin" placeholder="0.000">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        Calculate Risk Assessment
+                    </button>
+                    <div id="errorMsg" style="color: red; margin-top: 10px; text-align: center;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-card">
+            <h3>Assessment Complete</h3>
+            <p>Your calculated heart disease risk is:</p>
+            <div class="risk-score" id="resultValue">0%</div>
+            <p id="resultText">Based on the provided metrics.</p>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                window.location.href = "{% url 'auth' %}";
+            }
+        });
+
+        async function handlePredictById(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+            errorMsg.textContent = '';
+
+            const formData = new FormData(e.target);
+            const data = {
+                age: formData.get('age'),
+                gender: formData.get('gender'),
+                heart_rate: formData.get('heart_rate'),
+                systolic_bp: formData.get('systolic_bp'),
+                diastolic_bp: formData.get('diastolic_bp'),
+                blood_sugar: formData.get('blood_sugar'),
+                ck_mb: formData.get('ck_mb') || 0, // Default to 0 if empty
+                troponin: formData.get('troponin') || 0 // Default to 0 if empty
+            };
+
+            try {
+                const response = await fetch('/api/predict-risk/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.status === 401) {
+                    // Token expired or invalid
+                    window.location.href = "{% url 'auth' %}";
+                    return;
+                }
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResult(result.risk_percentage);
+                } else {
+                    errorMsg.textContent = result.error || 'An error occurred during analysis.';
+                }
+
+            } catch (err) {
+                errorMsg.textContent = 'Network error. Please try again.';
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Calculate Risk Assessment';
+            }
+        }
+
+        function showResult(percentage) {
+            const modal = document.getElementById('resultModal');
+            const value = document.getElementById('resultValue');
+            const text = document.getElementById('resultText');
+            
+            value.textContent = parseFloat(percentage).toFixed(1) + '%';
+            
+            if (percentage < 30) {
+                text.textContent = "Low Risk. Keep up the healthy lifestyle!";
+                value.style.background = "#10b981";
+                value.style.webkitBackgroundClip = "text";
+            } else if (percentage < 70) {
+                text.textContent = "Moderate Risk. Consult a doctor for advice.";
+                value.style.background = "#f59e0b";
+                value.style.webkitBackgroundClip = "text";
+            } else {
+                text.textContent = "High Risk. Please seek medical attention immediately.";
+                value.style.background = "#ef4444";
+                value.style.webkitBackgroundClip = "text";
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>

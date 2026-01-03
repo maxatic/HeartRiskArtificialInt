@@ -479,8 +479,8 @@
                     localStorage.setItem('accessToken', result.access);
                     localStorage.setItem('refreshToken', result.refresh);
 
-                    // Redirect to home page
-                    window.location.href = "{% url 'home' %}";
+                    // Redirect to predict page
+                    window.location.href = "{% url 'predict_page' %}";
                 } else {
                     alert('Login failed. Please check your credentials.');
                     btn.textContent = originalText;

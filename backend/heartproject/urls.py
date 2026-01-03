@@ -17,5 +17,6 @@ urlpatterns = [
     # endpoint, where 'Renewer' - send refresh token here to get new access token
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/predict-risk/', views.predict_heart_risk, name='predict_risk'),
+    path('predict/', views.predict_page, name='predict_page'),
     
 ]

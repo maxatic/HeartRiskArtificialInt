@@ -77,9 +77,14 @@ def predict_heart_risk(request):
     return Response(serializer.errors, status=400)
 
 
+
 def home(request):
     """Render the home landing page."""
     return render(request, 'home.html')
+
+def predict_page(request):
+    """Render the prediction interface."""
+    return render(request, 'predict.html')
 
 
 from django.contrib.auth.models import User
