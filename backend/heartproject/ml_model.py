@@ -15,6 +15,7 @@ import joblib
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / 'data' / 'Medicaldataset.csv'
 MODEL_PATH = BASE_DIR / 'data' / 'heart_model.joblib'
+SCALER_PATH = BASE_DIR / 'data' / 'scaler.joblib'
 
 # Feature columns in order
 FEATURE_COLUMNS = [
@@ -62,17 +63,53 @@ def train_model(test_size=0.2, random_state=42):
     
     print(f"\nAccuracy: {accuracy:.4f}")
     
-
-def load_model():
+    # Save model AND scaler
+    joblib.dump(model, MODEL_PATH)
+    joblib.dump(scaler, SCALER_PATH)
+    print(f"Model saved to {MODEL_PATH}")
+    print(f"Scaler saved to {SCALER_PATH}")
     
-    if not MODEL_PATH.exists():
+
+def load_model_and_scaler():
+    if not MODEL_PATH.exists() or not SCALER_PATH.exists():
         raise FileNotFoundError(
-            f"Model not found at {MODEL_PATH}. "
+            "Model or scaler not found. "
             "Please run train_model() first."
         )
-    return joblib.load(MODEL_PATH)
+    model = joblib.load(MODEL_PATH)
+    scaler = joblib.load(SCALER_PATH)
+    return model, scaler
 
 
+def predict_risk(data):
+    """
+    Predicts heart disease risk percentage for a single patient.
+    
+    Args:
+        data (dict): Dictionary containing patient data with keys matching FEATURE_COLUMNS
+        
+    Returns:
+        float: Risk percentage (0-100)
+    """
+    model, scaler = load_model_and_scaler()
+    
+    # Ensure data is in correct order
+    input_data = []
+    for col in FEATURE_COLUMNS:
+        if col not in data:
+            raise ValueError(f"Missing required field: {col}")
+        input_data.append(data[col])
+    
+    # Reshape for single sample
+    input_array = np.array(input_data).reshape(1, -1)
+    
+    # Scale
+    scaled_input = scaler.transform(input_array)
+    
+    # Predict probability of positive class (index 1)
+    probability = model.predict_proba(scaled_input)[0][1]
+    
+    return probability * 100
 
 if __name__ == '__main__':
     train_model()
