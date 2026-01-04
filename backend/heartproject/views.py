@@ -112,3 +112,8 @@ def auth(request):
             messages.error(request, f'Error creating account: {str(e)}')
             
     return render(request, 'auth.html')
+
+def dashboard(request):
+    """Render the patient dashboard."""
+    return render(request, 'dashboard.html')
+

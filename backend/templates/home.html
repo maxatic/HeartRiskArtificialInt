@@ -793,7 +793,7 @@
         function updateNavForLoggedInUser() {
             const navButtons = document.querySelector('.nav-buttons');
             navButtons.innerHTML = `
-                <a href="#" class="btn btn-primary">Dashboard</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a>
                 <button onclick="logout()" class="btn btn-secondary" style="border: 1px solid #e0e0e0; background: transparent;">Logout</button>
             `;
         }

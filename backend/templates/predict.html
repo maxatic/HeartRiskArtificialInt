@@ -133,7 +133,8 @@
             color: #1a1a1a;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 12px 16px;
             border-radius: 8px;
@@ -146,7 +147,8 @@
             outline: none;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             border-color: #3b82f6;
             background: #ffffff;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -179,7 +181,7 @@
         .submit-btn:hover {
             background: #1e293b;
         }
-        
+
         .submit-btn:disabled {
             background: #94a3b8;
             cursor: not-allowed;
@@ -267,18 +269,20 @@
         </nav>
 
         <div class="content-wrapper">
-            <a href="{% url 'home' %}" class="back-link">
+            <a href="{% url 'dashboard' %}" class="back-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-                Back to Home
+                Back to Dashboard
             </a>
 
             <div class="page-header">
                 <h1 class="page-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
-                        <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                        stroke="#ef4444" stroke-width="2">
+                        <path
+                            d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z" />
                     </svg>
                     Health Assessment
                 </h1>
@@ -370,7 +374,7 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const errorMsg = document.getElementById('errorMsg');
-            
+
             btn.disabled = true;
             btn.textContent = 'Analyzing...';
             errorMsg.textContent = '';
@@ -404,7 +408,7 @@
                 }
 
                 const result = await response.json();
-                
+
                 if (response.ok) {
                     showResult(result.risk_percentage);
                 } else {
@@ -424,9 +428,9 @@
             const modal = document.getElementById('resultModal');
             const value = document.getElementById('resultValue');
             const text = document.getElementById('resultText');
-            
+
             value.textContent = parseFloat(percentage).toFixed(1) + '%';
-            
+
             if (percentage < 30) {
                 text.textContent = "Low Risk. Keep up the healthy lifestyle!";
                 value.style.background = "#10b981";
@@ -440,7 +444,7 @@
                 value.style.background = "#ef4444";
                 value.style.webkitBackgroundClip = "text";
             }
-            
+
             modal.classList.add('active');
         }
 
