@@ -59,15 +59,20 @@ def predict_heart_risk(request):
                  model_input['Gender'] = int(data['gender'])
 
             
-            # 2. Get Prediction
-            risk_percentage = predict_risk(model_input)
+            # 2. Get Prediction and Explanations
+            risk_percentage, shap_values = predict_risk(model_input)
             
             # 3. Save to DB
-            record = serializer.save(user=request.user, result=risk_percentage)
+            record = serializer.save(
+                user=request.user, 
+                result=risk_percentage,
+                shap_values=shap_values
+            )
             
             return Response({
                 "status": "success",
                 "risk_percentage": risk_percentage,
+                "shap_values": shap_values, 
                 "record_id": record.id
             })
             
@@ -75,6 +80,14 @@ def predict_heart_risk(request):
             return Response({"error": str(e)}, status=400)
     
     return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_patient_history(request):
+    """Fetch recent assessments for the logged-in user."""
+    records = MedicalRecord.objects.filter(user=request.user).order_by('-created_at')[:10] # Get last 10
+    serializer = MedicalRecordSerializer(records, many=True)
+    return Response(serializer.data)
 
 
 

@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
 from pathlib import Path
 import joblib
+import shap
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -109,7 +110,30 @@ def predict_risk(data):
     # Predict probability of positive class (index 1)
     probability = model.predict_proba(scaled_input)[0][1]
     
-    return probability * 100
+    # Calculate SHAP values
+    # We use TreeExplainer for Random Forest
+    # Note: shap_values for classification often return a list [values_for_class_0, values_for_class_1]
+    # We want class 1 (postive risk)
+    explainer = shap.TreeExplainer(model)
+    shap_vals = explainer.shap_values(scaled_input)
+    
+    # Handle different SHAP output formats (sometimes array, sometimes list of arrays)
+    if isinstance(shap_vals, list):
+        shap_vals_class_1 = shap_vals[1][0]
+    else:
+        # If binary classification output is single array (less common for RF in shap but possible)
+        if len(shap_vals.shape) == 3:
+             shap_vals_class_1 = shap_vals[0, :, 1]
+        else:
+             shap_vals_class_1 = shap_vals[0]
+
+    # Create a dictionary of Feature Name -> SHAP Value
+    # This explains how much each feature contributed to the risk score calculation
+    shap_dict = {}
+    for i, col in enumerate(FEATURE_COLUMNS):
+        shap_dict[col] = float(shap_vals_class_1[i])
+
+    return probability * 100, shap_dict
 
 if __name__ == '__main__':
     train_model()

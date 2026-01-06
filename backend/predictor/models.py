@@ -16,6 +16,10 @@ class MedicalRecord(models.Model):
 
     # Store the prediction result (risk percentage)
     result = models.FloatField(blank=True, null=True, help_text="Risk percentage (0-100)")
+    
+    # Store SHAP values for explainability
+    shap_values = models.JSONField(blank=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
