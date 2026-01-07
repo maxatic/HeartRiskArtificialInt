@@ -408,10 +408,14 @@
                 }
 
                 const result = await response.json();
+                console.log("Prediction Result:", result); // Debugging
 
                 if (response.ok) {
-                    showResult(result.risk_percentage);
+                    console.log("Redirecting to:", `/result/${result.record_id}/`);
+                    // Redirect to the new detailed result page
+                    window.location.href = `/result/${result.record_id}/`;
                 } else {
+                    console.error("Error:", result);
                     errorMsg.textContent = result.error || 'An error occurred during analysis.';
                 }
 

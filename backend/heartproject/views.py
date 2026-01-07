@@ -1,7 +1,7 @@
 """
 Views for the CardioGuard Assistant application.
 """
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -59,6 +59,7 @@ def predict_heart_risk(request):
                  model_input['Gender'] = int(data['gender'])
 
             
+            
             # 2. Get Prediction and Explanations
             risk_percentage, shap_values = predict_risk(model_input)
             
@@ -89,6 +90,30 @@ def get_patient_history(request):
     serializer = MedicalRecordSerializer(records, many=True)
     return Response(serializer.data)
 
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_assessment_detail(request, record_id):
+    """
+    API endpoint to fetch a specific assessment details and history.
+    """
+    record = get_object_or_404(MedicalRecord, id=record_id, user=request.user)
+    serializer = MedicalRecordSerializer(record)
+    
+    # Get history for trend chart
+    history_qs = MedicalRecord.objects.filter(user=request.user).order_by('created_at')
+    history_data = []
+    for h in history_qs:
+        history_data.append({
+            'date': h.created_at.strftime('%d/%m'),
+            'score': h.result
+        })
+        
+    return Response({
+        "record": serializer.data,
+        "history": history_data
+    })
 
 
 def home(request):
@@ -129,4 +154,8 @@ def auth(request):
 def dashboard(request):
     """Render the patient dashboard."""
     return render(request, 'dashboard.html')
+
+def result_page(request, record_id):
+    """Render the detailed result page. Data fetched via JS."""
+    return render(request, 'result.html', {'record_id': record_id})
 
