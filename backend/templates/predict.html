@@ -230,6 +230,7 @@
             margin: 20px 0;
             background: linear-gradient(135deg, #ef4444 0%, #7c3aed 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -439,14 +440,20 @@
                 text.textContent = "Low Risk. Keep up the healthy lifestyle!";
                 value.style.background = "#10b981";
                 value.style.webkitBackgroundClip = "text";
+                value.style.backgroundClip = "text";
+                value.style.webkitTextFillColor = "transparent";
             } else if (percentage < 70) {
                 text.textContent = "Moderate Risk. Consult a doctor for advice.";
                 value.style.background = "#f59e0b";
                 value.style.webkitBackgroundClip = "text";
+                value.style.backgroundClip = "text";
+                value.style.webkitTextFillColor = "transparent";
             } else {
                 text.textContent = "High Risk. Please seek medical attention immediately.";
                 value.style.background = "#ef4444";
                 value.style.webkitBackgroundClip = "text";
+                value.style.backgroundClip = "text";
+                value.style.webkitTextFillColor = "transparent";
             }
 
             modal.classList.add('active');
