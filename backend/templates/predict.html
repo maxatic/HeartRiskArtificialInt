@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 
 <head>
     <meta charset="UTF-8">
@@ -362,6 +363,7 @@
         </div>
     </div>
 
+    <script src="{% static 'js/api.js' %}"></script>
     <script>
         // Check authentication on load
         document.addEventListener('DOMContentLoaded', () => {
@@ -393,18 +395,17 @@
             };
 
             try {
-                const response = await fetch('/api/predict-risk/', {
+                // Use authenticatedFetch handling auto-refresh
+                const response = await authenticatedFetch('/api/predict-risk/', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
 
                 if (response.status === 401) {
-                    // Token expired or invalid
-                    window.location.href = "{% url 'auth' %}";
+                    // authenticatedFetch should handle redirect, but just in case
                     return;
                 }
 

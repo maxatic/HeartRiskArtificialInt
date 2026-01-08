@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 
 <head>
     <meta charset="UTF-8">
@@ -463,6 +464,7 @@
         </div>
     </div>
 
+    <script src="{% static 'js/api.js' %}"></script>
     <script>
         // The record ID is passed from the view
         const RECORD_ID = "{{ record_id }}";
@@ -475,14 +477,11 @@
             }
 
             try {
-                const response = await fetch(`/api/result/${RECORD_ID}/`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                // Use authenticatedFetch handling auto-refresh
+                const response = await authenticatedFetch(`/api/result/${RECORD_ID}/`);
 
                 if (response.status === 401) {
-                    window.location.href = "{% url 'auth' %}";
+                    // authenticatedFetch handles redirect
                     return;
                 }
 

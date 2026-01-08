@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 
 <head>
     <meta charset="UTF-8">
@@ -383,6 +384,7 @@
         </main>
     </div>
 
+    <script src="{% static 'js/api.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', fetchHistory);
 
@@ -394,14 +396,11 @@
             }
 
             try {
-                const response = await fetch('/api/history/', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                // Use authenticatedFetch handling auto-refresh
+                const response = await authenticatedFetch('/api/history/');
 
                 if (response.status === 401) {
-                    window.location.href = "{% url 'auth' %}";
+                    // authenticatedFetch handles redirect
                     return;
                 }
 
