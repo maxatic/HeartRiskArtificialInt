@@ -450,8 +450,11 @@
                     riskLabel = 'Moderate Risk';
                 }
 
-                const item = document.createElement('div');
+                const item = document.createElement('a');
                 item.className = 'assessment-item';
+                item.href = `/result/${record.id}/`;
+                item.style.textDecoration = 'none';
+                item.style.color = 'inherit';
                 item.innerHTML = `
                     <div class="assessment-info">
                         <div>
