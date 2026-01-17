@@ -319,7 +319,7 @@
                 <span>CardioGuard Assistant</span>
             </div>
             <div class="nav-right">
-                <span class="user-welcome">Welcome back</span>
+                <span class="user-welcome" id="userWelcome">Welcome back</span>
                 <a href="#" onclick="logout()" class="logout-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -386,7 +386,10 @@
 
     <script src="{% static 'js/api.js' %}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', fetchHistory);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchHistory();
+            fetchUserProfile();
+        });
 
         async function fetchHistory() {
             const token = localStorage.getItem('accessToken');
@@ -409,6 +412,28 @@
             } catch (error) {
                 console.error('Error fetching history:', error);
                 // Optionally show error state
+            }
+        }
+
+        async function fetchUserProfile() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                return;
+            }
+
+            try {
+                const response = await authenticatedFetch('/api/me/');
+                if (!response.ok) {
+                    return;
+                }
+
+                const profile = await response.json();
+                const name = (profile.full_name || '').trim() || profile.username || profile.email || '';
+                if (name) {
+                    document.getElementById('userWelcome').textContent = `Welcome back, ${name}`;
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
             }
         }
 

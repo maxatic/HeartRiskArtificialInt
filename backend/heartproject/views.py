@@ -14,6 +14,17 @@ def my_health_summary(request):
         "status": "Secure Access Granted",
     })
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_profile(request):
+    user = request.user
+    full_name = user.get_full_name().strip()
+    return Response({
+        "full_name": full_name,
+        "username": user.username,
+        "email": user.email,
+    })
+
 from predictor.serializers import MedicalRecordSerializer
 from predictor.models import MedicalRecord
 from .ml_model import predict_risk
@@ -106,6 +117,7 @@ def get_assessment_detail(request, record_id):
     history_data = []
     for h in history_qs:
         history_data.append({
+            'id': h.id,
             'date': h.created_at.strftime('%d/%m'),
             'score': h.result
         })
@@ -134,6 +146,7 @@ def auth(request):
     if request.method == 'POST' and request.POST.get('form_type') == 'signup':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        full_name = request.POST.get('full_name', '').strip()
         
         # Simple validation
         if User.objects.filter(username=email).exists():
@@ -143,6 +156,11 @@ def auth(request):
         # Create user (using email as username)
         try:
             user = User.objects.create_user(username=email, email=email, password=password) #Django's default User model requires a username. It's a mandatory field in the database.
+            if full_name:
+                name_parts = full_name.split()
+                user.first_name = name_parts[0]
+                if len(name_parts) > 1:
+                    user.last_name = " ".join(name_parts[1:])
             user.save()
             messages.success(request, 'Account created successfully! Please sign in.')
             return redirect('auth')

@@ -200,9 +200,17 @@
         /* Grid Layout */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
             gap: 24px;
             margin-bottom: 24px;
+            align-items: stretch;
+        }
+
+        .right-column {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 24px;
+            height: 100%;
         }
 
         /* Cards */
@@ -213,6 +221,12 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
+        #riskFactorsCard {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
         .card h3 {
             font-size: 16px;
             font-weight: 600;
@@ -221,6 +235,74 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        /* Risk Factors */
+        .risk-factors-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .risk-factor-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .risk-factor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .risk-factor-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .risk-factor-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .risk-factor-value {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .risk-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: #dc2626;
+            white-space: nowrap;
+        }
+
+        .risk-badge.negative {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .risk-bar-track {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .risk-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #111827;
+            border-radius: inherit;
+            transition: width 0.8s ease;
         }
 
         /* Metrics Grid */
@@ -253,6 +335,27 @@
             position: relative;
             height: 300px;
             width: 100%;
+        }
+
+        .pie-container {
+            position: relative;
+            height: 260px;
+            width: 100%;
+        }
+
+        .empty-state-text {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .right-column {
+                grid-template-rows: auto;
+            }
         }
 
         /* Bottom History */
@@ -376,41 +479,81 @@
             </div>
 
             <div class="dashboard-grid">
-                <!-- Health Metrics -->
-                <div class="card">
+                <!-- Risk Factors Analysis -->
+                <div class="card" id="riskFactorsCard">
                     <h3>
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                             viewBox="0 0 24 24">
-                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                            <polyline points="13 2 13 9 20 9"></polyline>
+                            <path d="M3 3v18h18"></path>
+                            <path d="M7 15l3-3 3 2 4-5"></path>
                         </svg>
-                        Your Health Metrics
+                        Risk Factors Analysis
                     </h3>
-                    <div class="metrics-grid">
-                        <div class="metric-box">
-                            <div class="metric-label">Age</div>
-                            <div class="metric-value" id="m_age">--</div>
+                    <div class="risk-factors-list" id="riskFactorsList"></div>
+                    <p class="empty-state-text" id="riskFactorsEmpty" style="display: none;">
+                        Contribution details are not available for this assessment.
+                    </p>
+                </div>
+
+                <div class="right-column">
+                    <!-- Health Metrics -->
+                    <div class="card">
+                        <h3>
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                <polyline points="13 2 13 9 20 9"></polyline>
+                            </svg>
+                            Your Health Metrics
+                        </h3>
+                        <div class="metrics-grid">
+                            <div class="metric-box">
+                                <div class="metric-label">Age</div>
+                                <div class="metric-value" id="m_age">--</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Heart Rate</div>
+                                <div class="metric-value" id="m_hr">--</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Systolic BP</div>
+                                <div class="metric-value" id="m_sbp">--</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Diastolic BP</div>
+                                <div class="metric-value" id="m_dbp">--</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Blood Sugar</div>
+                                <div class="metric-value" id="m_bs">--</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">CK-MB</div>
+                                <div class="metric-value" id="m_ckmb">--</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-label">Troponin</div>
+                                <div class="metric-value" id="m_trop">--</div>
+                            </div>
                         </div>
-                        <div class="metric-box">
-                            <div class="metric-label">Heart Rate</div>
-                            <div class="metric-value" id="m_hr">--</div>
+                    </div>
+
+                    <!-- Risk Distribution -->
+                    <div class="card" id="riskDistributionCard">
+                        <h3>
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M21 12a9 9 0 1 1-9-9"></path>
+                                <path d="M22 12h-10V2"></path>
+                            </svg>
+                            Risk Distribution
+                        </h3>
+                        <div class="pie-container">
+                            <canvas id="riskDistributionChart"></canvas>
                         </div>
-                        <div class="metric-box">
-                            <div class="metric-label">Systolic BP</div>
-                            <div class="metric-value" id="m_sbp">--</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-label">Diastolic BP</div>
-                            <div class="metric-value" id="m_dbp">--</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-label">Blood Sugar</div>
-                            <div class="metric-value" id="m_bs">--</div>
-                        </div>
-                        <div class="metric-box">
-                            <div class="metric-label">CK-MB</div>
-                            <div class="metric-value" id="m_ckmb">--</div>
-                        </div>
+                        <p class="empty-state-text" id="riskDistributionEmpty" style="display: none;">
+                            Distribution is unavailable for this assessment.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -469,6 +612,9 @@
         // The record ID is passed from the view
         const RECORD_ID = "{{ record_id }}";
 
+        let riskDistributionChart = null;
+        let historyHoverTimeout = null;
+
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('accessToken');
             if (!token) {
@@ -514,7 +660,10 @@
             document.getElementById('m_sbp').textContent = record.systolic_bp + ' mmHg';
             document.getElementById('m_dbp').textContent = record.diastolic_bp + ' mmHg';
             document.getElementById('m_bs').textContent = record.blood_sugar + ' mg/dL';
-            document.getElementById('m_ckmb').textContent = record.ck_mb || 'N/A';
+            const ckmbValue = record.ck_mb === 0 ? '0' : (record.ck_mb || 'N/A');
+            const troponinValue = record.troponin === 0 ? '0' : (record.troponin || 'N/A');
+            document.getElementById('m_ckmb').textContent = ckmbValue;
+            document.getElementById('m_trop').textContent = troponinValue;
 
             // --- 2. Banner Logic ---
             const riskScore = parseFloat(record.result);
@@ -559,7 +708,10 @@
                 if (bannerClass === 'high') banner.style.borderColor = '#fee2e2'; // Reset override
             }, 100);
 
-            // --- 3. Charts ---
+            // --- 3. SHAP Breakdown ---
+            renderRiskBreakdown(record);
+
+            // --- 4. Charts ---
             Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
             Chart.defaults.color = '#64748b';
 
@@ -567,6 +719,7 @@
             // history array of {date: string, score: number}
             const historyDates = history.map(h => h.date);
             const historyScores = history.map(h => h.score);
+            const historyIds = history.map(h => h.id);
 
             new Chart(document.getElementById('historyChart'), {
                 type: 'line',
@@ -600,6 +753,188 @@
                         },
                         x: {
                             grid: { display: false }
+                        }
+                    },
+                    onHover: (event, elements, chart) => {
+                        const canvas = chart.canvas;
+                        if (elements.length > 0) {
+                            canvas.style.cursor = 'pointer';
+                            const index = elements[0].index;
+                            const recordId = historyIds[index];
+
+                            if (historyHoverTimeout) {
+                                clearTimeout(historyHoverTimeout);
+                            }
+
+                            historyHoverTimeout = setTimeout(() => {
+                                if (recordId && String(recordId) !== String(RECORD_ID)) {
+                                    window.location.href = `/result/${recordId}/`;
+                                }
+                            }, 600);
+                        } else {
+                            canvas.style.cursor = 'default';
+                            if (historyHoverTimeout) {
+                                clearTimeout(historyHoverTimeout);
+                                historyHoverTimeout = null;
+                            }
+                        }
+                    },
+                    onLeave: (event, elements, chart) => {
+                        chart.canvas.style.cursor = 'default';
+                        if (historyHoverTimeout) {
+                            clearTimeout(historyHoverTimeout);
+                            historyHoverTimeout = null;
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRiskBreakdown(record) {
+            const riskScore = Number.parseFloat(record.result) || 0;
+            const shapValues = record.shap_values || {};
+            const riskFactorsList = document.getElementById('riskFactorsList');
+            const riskFactorsEmpty = document.getElementById('riskFactorsEmpty');
+            const riskDistributionEmpty = document.getElementById('riskDistributionEmpty');
+            const riskDistributionCard = document.getElementById('riskDistributionCard');
+
+            const factorConfig = [
+                { key: 'Age', label: 'Age', value: `${record.age} years` },
+                { key: 'Heart rate', label: 'Heart Rate', value: `${record.heart_rate} bpm` },
+                { key: 'Systolic blood pressure', label: 'Systolic Blood Pressure', value: `${record.systolic_bp} mmHg` },
+                { key: 'Diastolic blood pressure', label: 'Diastolic Blood Pressure', value: `${record.diastolic_bp} mmHg` },
+                { key: 'Blood sugar', label: 'Blood Sugar', value: `${record.blood_sugar} mg/dL` },
+                { key: 'CK-MB', label: 'CK-MB', value: record.ck_mb === 0 ? '0' : (record.ck_mb || 'N/A') },
+                { key: 'Troponin', label: 'Troponin', value: record.troponin === 0 ? '0' : (record.troponin || 'N/A') }
+            ];
+
+            const factors = factorConfig.map((factor) => {
+                const shap = Number(shapValues[factor.key]);
+                const safeShap = Number.isFinite(shap) ? shap : 0;
+                return {
+                    ...factor,
+                    shap: safeShap,
+                    abs: Math.abs(safeShap)
+                };
+            });
+
+            const sumSigned = factors.reduce((sum, item) => sum + item.shap, 0);
+            const scale = Math.abs(sumSigned) > 1e-6 ? riskScore / sumSigned : null;
+
+            riskFactorsList.innerHTML = '';
+
+            if (!scale || !Number.isFinite(scale)) {
+                riskFactorsEmpty.style.display = 'block';
+                riskDistributionEmpty.style.display = 'block';
+                riskDistributionCard.style.opacity = '0.6';
+                return;
+            }
+
+            riskFactorsEmpty.style.display = 'none';
+            riskDistributionEmpty.style.display = 'none';
+            riskDistributionCard.style.opacity = '1';
+
+            const rawPoints = factors.map((factor) => factor.shap * scale);
+            const roundedPoints = rawPoints.map((value) => Math.round(value * 10) / 10);
+            const sumRounded = roundedPoints.reduce((sum, value) => sum + value, 0);
+            const diff = Math.round((riskScore - sumRounded) * 10) / 10;
+
+            if (Math.abs(diff) >= 0.1) {
+                const indexToAdjust = roundedPoints.reduce((bestIndex, value, index, arr) => {
+                    if (Math.abs(value) > Math.abs(arr[bestIndex])) {
+                        return index;
+                    }
+                    return bestIndex;
+                }, 0);
+                roundedPoints[indexToAdjust] = Math.round((roundedPoints[indexToAdjust] + diff) * 10) / 10;
+            }
+
+            const maxAbsPoints = roundedPoints.reduce((max, value) => Math.max(max, Math.abs(value)), 0);
+            const totalAbsPoints = roundedPoints.reduce((sum, value) => sum + Math.abs(value), 0);
+
+            if (maxAbsPoints <= 0 || totalAbsPoints <= 0) {
+                riskFactorsEmpty.style.display = 'block';
+                riskDistributionEmpty.style.display = 'block';
+                riskDistributionCard.style.opacity = '0.6';
+                return;
+            }
+
+            const formatPoints = (value) => {
+                const absValue = Math.abs(value);
+                return Number.isInteger(absValue) ? absValue.toFixed(0) : absValue.toFixed(1);
+            };
+
+            factors.forEach((factor, index) => {
+                const points = roundedPoints[index];
+                const barWidth = (Math.abs(points) / maxAbsPoints) * 100;
+                const isNegative = points < 0;
+
+                const item = document.createElement('div');
+                item.className = 'risk-factor-item';
+                item.innerHTML = `
+                    <div class="risk-factor-header">
+                        <div>
+                            <div class="risk-factor-title">${factor.label}</div>
+                            <div class="risk-factor-subtitle">${factor.value}</div>
+                        </div>
+                        <div class="risk-badge ${isNegative ? 'negative' : ''}">
+                            ${isNegative ? '-' : '+'}${formatPoints(points)} pts
+                        </div>
+                    </div>
+                    <div class="risk-bar-track">
+                        <div class="risk-bar-fill" style="width: ${barWidth}%;"></div>
+                    </div>
+                `;
+
+                riskFactorsList.appendChild(item);
+            });
+
+            const pieLabels = factors.map((factor) => factor.label);
+            const pieData = roundedPoints.map((value) => Math.abs(value));
+
+            if (riskDistributionChart) {
+                riskDistributionChart.destroy();
+            }
+
+            riskDistributionChart = new Chart(document.getElementById('riskDistributionChart'), {
+                type: 'pie',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#f59e0b',
+                            '#eab308',
+                            '#22c55e',
+                            '#38bdf8',
+                            '#6366f1'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 10,
+                                padding: 16,
+                                usePointStyle: true,
+                                pointStyle: 'rectRounded'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const value = context.parsed || 0;
+                                    const percent = totalAbsPoints ? (value / totalAbsPoints) * 100 : 0;
+                                    return `${context.label}: ${percent.toFixed(1)}%`;
+                                }
+                            }
                         }
                     }
                 }
