@@ -26,7 +26,8 @@ def get_profile(request):
     })
 
 from predictor.serializers import MedicalRecordSerializer
-from predictor.models import MedicalRecord
+from predictor.serializers import MedicalRecordSerializer, PatientSerializer
+from predictor.models import MedicalRecord, Patient
 from .ml_model import predict_risk
 
 @api_view(['POST'])
@@ -181,3 +182,23 @@ def result_page(request, record_id):
     """Render the detailed result page. Data fetched via JS."""
     return render(request, 'result.html', {'record_id': record_id})
 
+    return render(request, 'result.html', {'record_id': record_id})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_patient(request):
+    """API to add a new patient for the logged-in doctor."""
+    serializer = PatientSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(doctor=request.user)
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_doctor_patients(request):
+    """API to get list of patients for the logged-in doctor."""
+    patients = Patient.objects.filter(doctor=request.user).order_by('-created_at')
+    serializer = PatientSerializer(patients, many=True)
+    return Response(serializer.data)

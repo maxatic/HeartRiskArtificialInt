@@ -287,6 +287,200 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            padding: 32px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            transform: translateY(20px);
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+        }
+
+        .close-btn:hover {
+            color: #1a1a1a;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+        }
+
+        .btn-cancel {
+            padding: 12px 20px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #374151;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            padding: 12px 20px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            background: #333;
+        }
+
+        /* Patient List Styles */
+        .patient-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .patient-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border: 1px solid #f0f0f0;
+            border-radius: 16px;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .patient-card:hover {
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        .patient-info {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .patient-avatar {
+            width: 48px;
+            height: 48px;
+            background: #eff6ff;
+            color: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .patient-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .patient-details p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .patient-id-badge {
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #4b5563;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -354,14 +548,15 @@
             <div class="patient-management-card">
                 <div class="section-header-row">
                     <h2 class="section-title">Patient Management</h2>
-                    <a href="#" class="add-patient-btn">
+                    <button onclick="openModal()" class="add-patient-btn"
+                        style="border:none; cursor:pointer; font-family:inherit;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
                         Add Patient
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Search -->
@@ -376,17 +571,184 @@
                 </div>
 
                 <!-- Empty State for Patient List as requested -->
-                <div class="empty-state">
-                    <!-- Kept empty state minimal/invisible if needed, but keeping structure for layout -->
+                <!-- Patient List Container -->
+                <div id="patient-list" class="patient-list">
+                    <!-- Loaded via JS -->
+                </div>
+
+                <!-- Empty State for Patient List -->
+                <div class="empty-state" id="empty-state" style="display:none;">
+                    <div class="empty-illustration">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <p class="empty-text">No patients added yet.</p>
                 </div>
             </div>
 
         </main>
     </div>
 
+    <!-- Add Patient Modal -->
+    <div class="modal-overlay" id="addPatientModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Patient</h3>
+                <button class="close-btn" onclick="closeModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="add-patient-form" onsubmit="submitPatient(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" placeholder="John" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" placeholder="Doe" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="john.doe@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" name="phone" placeholder="(555) 123-4567">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Patient ID (Optional)</label>
+                    <input type="text" name="patient_id" placeholder="e.g. P001">
+                </div>
+                <!-- Hidden inputs if needed, e.g. email/phone for future -->
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-submit" id="submit-btn">Add Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Fetch User Profile on Load
-        document.addEventListener('DOMContentLoaded', fetchUserProfile);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUserProfile();
+            fetchPatients();
+        });
+
+        async function fetchPatients() {
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch('/api/patients/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const patients = await response.json();
+                    renderPatients(patients);
+                }
+            } catch (error) {
+                console.error("Error fetching patients:", error);
+            }
+        }
+
+        function renderPatients(patients) {
+            const list = document.getElementById('patient-list');
+            const emptyState = document.getElementById('empty-state');
+            const countElement = document.querySelector('.stat-valid'); // Assumes first stat-valid is 'Total Patients'
+
+            // Update Count
+            if (countElement) countElement.textContent = patients.length;
+
+            if (patients.length === 0) {
+                list.style.display = 'none';
+                emptyState.style.display = 'flex';
+                return;
+            }
+
+            list.style.display = 'flex';
+            emptyState.style.display = 'none';
+            list.innerHTML = '';
+
+            patients.forEach(p => {
+                const initials = (p.first_name[0] + p.last_name[0]).toUpperCase();
+                const idBadge = p.patient_id ? `<span class="patient-id-badge">${p.patient_id}</span>` : '';
+
+                const item = document.createElement('div');
+                item.className = 'patient-card';
+                item.innerHTML = `
+                    <div class="patient-info">
+                        <div class="patient-avatar">${initials}</div>
+                        <div class="patient-details">
+                            <h3>${p.first_name} ${p.last_name} ${idBadge}</h3>
+                            <p>${p.email || 'No email'} • ${p.phone || 'No phone'}</p>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function submitPatient(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.textContent;
+            btn.textContent = "Adding...";
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const token = localStorage.getItem('accessToken');
+
+            try {
+                const response = await fetch('/api/patients/add/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    e.target.reset();
+                    fetchPatients(); // Reload list
+                } else {
+                    alert("Failed to add patient");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error adding patient");
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Modal Logic
+        function openModal() {
+            document.getElementById('addPatientModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('addPatientModal').classList.remove('active');
+        }
+
+        // Close on backdrop click
+        document.getElementById('addPatientModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addPatientModal') closeModal();
+        });
 
         async function fetchUserProfile() {
             const token = localStorage.getItem('accessToken');
@@ -396,7 +758,7 @@
             }
 
             try {
-                const response = await fetch('/api/user-profile/', {
+                const response = await fetch('/api/me/', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

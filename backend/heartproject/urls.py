@@ -24,5 +24,7 @@ urlpatterns = [
     path('result/<int:record_id>/', views.result_page, name='result_page'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('doctor-dashboard/', views.doctor_dashboard, name='doctor_dashboard'),
+    path('api/patients/add/', views.add_patient, name='add_patient'),
+    path('api/patients/', views.get_doctor_patients, name='get_doctor_patients'),
     
 ]
