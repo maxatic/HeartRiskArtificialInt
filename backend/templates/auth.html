@@ -479,8 +479,16 @@
                     localStorage.setItem('accessToken', result.access);
                     localStorage.setItem('refreshToken', result.refresh);
 
-                    // Redirect to dashboard page
-                    window.location.href = "{% url 'dashboard' %}";
+                    // Redirect to dashboard page based on role
+                    // Check the selected role from the hidden input to be safe
+                    const currentRole = document.getElementById('signin-role').value;
+                    console.log('Login successful, redirecting. Role:', currentRole);
+
+                    if (currentRole === 'doctor') {
+                        window.location.href = "{% url 'doctor_dashboard' %}";
+                    } else {
+                        window.location.href = "{% url 'dashboard' %}";
+                    }
                 } else {
                     alert('Login failed. Please check your credentials.');
                     btn.textContent = originalText;

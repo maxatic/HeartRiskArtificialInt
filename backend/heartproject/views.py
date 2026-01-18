@@ -14,6 +14,17 @@ def my_health_summary(request):
         "status": "Secure Access Granted",
     })
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_profile(request):
+    user = request.user
+    return Response({
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "username": user.username
+    })
+
 from predictor.serializers import MedicalRecordSerializer
 from predictor.models import MedicalRecord
 from .ml_model import predict_risk
@@ -116,4 +127,8 @@ def auth(request):
 def dashboard(request):
     """Render the patient dashboard."""
     return render(request, 'dashboard.html')
+
+def doctor_dashboard(request):
+    """Render the doctor dashboard."""
+    return render(request, 'doctor_dashboard.html')
 
