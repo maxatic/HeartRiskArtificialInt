@@ -1,7 +1,7 @@
 """
 Views for the CardioGuard Assistant application.
 """
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -16,13 +16,13 @@ def my_health_summary(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user_profile(request):
+def get_profile(request):
     user = request.user
+    full_name = user.get_full_name().strip()
     return Response({
-        "first_name": user.first_name,
-        "last_name": user.last_name,
+        "full_name": full_name,
+        "username": user.username,
         "email": user.email,
-        "username": user.username
     })
 
 from predictor.serializers import MedicalRecordSerializer
@@ -70,15 +70,21 @@ def predict_heart_risk(request):
                  model_input['Gender'] = int(data['gender'])
 
             
-            # 2. Get Prediction
-            risk_percentage = predict_risk(model_input)
+            
+            # 2. Get Prediction and Explanations
+            risk_percentage, shap_values = predict_risk(model_input)
             
             # 3. Save to DB
-            record = serializer.save(user=request.user, result=risk_percentage)
+            record = serializer.save(
+                user=request.user, 
+                result=risk_percentage,
+                shap_values=shap_values
+            )
             
             return Response({
                 "status": "success",
                 "risk_percentage": risk_percentage,
+                "shap_values": shap_values, 
                 "record_id": record.id
             })
             
@@ -87,6 +93,39 @@ def predict_heart_risk(request):
     
     return Response(serializer.errors, status=400)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_patient_history(request):
+    """Fetch recent assessments for the logged-in user."""
+    records = MedicalRecord.objects.filter(user=request.user).order_by('-created_at')[:10] # Get last 10
+    serializer = MedicalRecordSerializer(records, many=True)
+    return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_assessment_detail(request, record_id):
+    """
+    API endpoint to fetch a specific assessment details and history.
+    """
+    record = get_object_or_404(MedicalRecord, id=record_id, user=request.user)
+    serializer = MedicalRecordSerializer(record)
+    
+    # Get history for trend chart
+    history_qs = MedicalRecord.objects.filter(user=request.user).order_by('created_at')
+    history_data = []
+    for h in history_qs:
+        history_data.append({
+            'id': h.id,
+            'date': h.created_at.strftime('%d/%m'),
+            'score': h.result
+        })
+        
+    return Response({
+        "record": serializer.data,
+        "history": history_data
+    })
 
 
 def home(request):
@@ -107,6 +146,7 @@ def auth(request):
     if request.method == 'POST' and request.POST.get('form_type') == 'signup':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        full_name = request.POST.get('full_name', '').strip()
         
         # Simple validation
         if User.objects.filter(username=email).exists():
@@ -116,6 +156,11 @@ def auth(request):
         # Create user (using email as username)
         try:
             user = User.objects.create_user(username=email, email=email, password=password) #Django's default User model requires a username. It's a mandatory field in the database.
+            if full_name:
+                name_parts = full_name.split()
+                user.first_name = name_parts[0]
+                if len(name_parts) > 1:
+                    user.last_name = " ".join(name_parts[1:])
             user.save()
             messages.success(request, 'Account created successfully! Please sign in.')
             return redirect('auth')
@@ -131,4 +176,8 @@ def dashboard(request):
 def doctor_dashboard(request):
     """Render the doctor dashboard."""
     return render(request, 'doctor_dashboard.html')
+
+def result_page(request, record_id):
+    """Render the detailed result page. Data fetched via JS."""
+    return render(request, 'result.html', {'record_id': record_id})
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 
 <head>
     <meta charset="UTF-8">
@@ -230,6 +231,7 @@
             margin: 20px 0;
             background: linear-gradient(135deg, #ef4444 0%, #7c3aed 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -361,6 +363,7 @@
         </div>
     </div>
 
+    <script src="{% static 'js/api.js' %}"></script>
     <script>
         // Check authentication on load
         document.addEventListener('DOMContentLoaded', () => {
@@ -392,26 +395,29 @@
             };
 
             try {
-                const response = await fetch('/api/predict-risk/', {
+                // Use authenticatedFetch handling auto-refresh
+                const response = await authenticatedFetch('/api/predict-risk/', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 });
 
                 if (response.status === 401) {
-                    // Token expired or invalid
-                    window.location.href = "{% url 'auth' %}";
+                    // authenticatedFetch should handle redirect, but just in case
                     return;
                 }
 
                 const result = await response.json();
+                console.log("Prediction Result:", result); // Debugging
 
                 if (response.ok) {
-                    showResult(result.risk_percentage);
+                    console.log("Redirecting to:", `/result/${result.record_id}/`);
+                    // Redirect to the new detailed result page
+                    window.location.href = `/result/${result.record_id}/`;
                 } else {
+                    console.error("Error:", result);
                     errorMsg.textContent = result.error || 'An error occurred during analysis.';
                 }
 
@@ -435,14 +441,20 @@
                 text.textContent = "Low Risk. Keep up the healthy lifestyle!";
                 value.style.background = "#10b981";
                 value.style.webkitBackgroundClip = "text";
+                value.style.backgroundClip = "text";
+                value.style.webkitTextFillColor = "transparent";
             } else if (percentage < 70) {
                 text.textContent = "Moderate Risk. Consult a doctor for advice.";
                 value.style.background = "#f59e0b";
                 value.style.webkitBackgroundClip = "text";
+                value.style.backgroundClip = "text";
+                value.style.webkitTextFillColor = "transparent";
             } else {
                 text.textContent = "High Risk. Please seek medical attention immediately.";
                 value.style.background = "#ef4444";
                 value.style.webkitBackgroundClip = "text";
+                value.style.backgroundClip = "text";
+                value.style.webkitTextFillColor = "transparent";
             }
 
             modal.classList.add('active');
