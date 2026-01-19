@@ -10,11 +10,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
 from pathlib import Path
 import joblib
+import shap
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / 'data' / 'Medicaldataset.csv'
 MODEL_PATH = BASE_DIR / 'data' / 'heart_model.joblib'
+SCALER_PATH = BASE_DIR / 'data' / 'scaler.joblib'
 
 # Feature columns in order
 FEATURE_COLUMNS = [
@@ -62,17 +64,76 @@ def train_model(test_size=0.2, random_state=42):
     
     print(f"\nAccuracy: {accuracy:.4f}")
     
-
-def load_model():
+    # Save model AND scaler
+    joblib.dump(model, MODEL_PATH)
+    joblib.dump(scaler, SCALER_PATH)
+    print(f"Model saved to {MODEL_PATH}")
+    print(f"Scaler saved to {SCALER_PATH}")
     
-    if not MODEL_PATH.exists():
+
+def load_model_and_scaler():
+    if not MODEL_PATH.exists() or not SCALER_PATH.exists():
         raise FileNotFoundError(
-            f"Model not found at {MODEL_PATH}. "
+            "Model or scaler not found. "
             "Please run train_model() first."
         )
-    return joblib.load(MODEL_PATH)
+    model = joblib.load(MODEL_PATH)
+    scaler = joblib.load(SCALER_PATH)
+    return model, scaler
 
 
+def predict_risk(data):
+    """
+    Predicts heart disease risk percentage for a single patient.
+    
+    Args:
+        data (dict): Dictionary containing patient data with keys matching FEATURE_COLUMNS
+        
+    Returns:
+        float: Risk percentage (0-100)
+    """
+    model, scaler = load_model_and_scaler()
+    
+    # Ensure data is in correct order
+    input_data = []
+    for col in FEATURE_COLUMNS:
+        if col not in data:
+            raise ValueError(f"Missing required field: {col}")
+        input_data.append(data[col])
+    
+    # Reshape for single sample
+    input_array = np.array(input_data).reshape(1, -1)
+    
+    # Scale
+    scaled_input = scaler.transform(input_array)
+    
+    # Predict probability of positive class (index 1)
+    probability = model.predict_proba(scaled_input)[0][1]
+    
+    # Calculate SHAP values
+    # We use TreeExplainer for Random Forest
+    # Note: shap_values for classification often return a list [values_for_class_0, values_for_class_1]
+    # We want class 1 (postive risk)
+    explainer = shap.TreeExplainer(model)
+    shap_vals = explainer.shap_values(scaled_input)
+    
+    # Handle different SHAP output formats (sometimes array, sometimes list of arrays)
+    if isinstance(shap_vals, list):
+        shap_vals_class_1 = shap_vals[1][0]
+    else:
+        # If binary classification output is single array (less common for RF in shap but possible)
+        if len(shap_vals.shape) == 3:
+             shap_vals_class_1 = shap_vals[0, :, 1]
+        else:
+             shap_vals_class_1 = shap_vals[0]
+
+    # Create a dictionary of Feature Name -> SHAP Value
+    # This explains how much each feature contributed to the risk score calculation
+    shap_dict = {}
+    for i, col in enumerate(FEATURE_COLUMNS):
+        shap_dict[col] = float(shap_vals_class_1[i])
+
+    return probability * 100, shap_dict
 
 if __name__ == '__main__':
     train_model()

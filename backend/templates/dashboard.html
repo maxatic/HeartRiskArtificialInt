@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CardioGuard Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #1a1a1a;
+        }
+
+        .logo svg {
+            color: #ef4444;
+            fill: #ef4444;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .user-welcome {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: transparent;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #f5f5f5;
+            color: #1a1a1a;
+        }
+
+        /* Main Content */
+        .dashboard-content {
+            padding: 40px;
+            flex: 1;
+        }
+
+        .dashboard-header {
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-header p {
+            color: #666;
+        }
+
+        /* Assessment Card */
+        .new-assessment-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 32px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 48px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+        }
+
+        .new-assessment-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            transform: translateY(-2px);
+        }
+
+        .plus-icon-container {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .plus-icon {
+            color: white;
+            width: 28px;
+            height: 28px;
+        }
+
+        .card-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1a1a1a;
+        }
+
+        .card-content p {
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        /* Recent Assessments */
+        .recent-section {
+            background: #fff;
+            border-radius: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .empty-state {
+            border: 2px dashed #e5e7eb;
+            border-radius: 16px;
+            padding: 64px 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-icon {
+            color: #9ca3af;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary {
+            background: #1a1a1a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        /* Assessment List Items */
+        .assessment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .assessment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border: 1px solid #f0f0f0;
+            border-radius: 16px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        .assessment-item:hover {
+            border-color: #e2e8f0;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transform: translateY(-1px);
+        }
+
+        .assessment-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .assessment-date {
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 15px;
+        }
+
+        .assessment-meta {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .risk-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background: #ecfdf5;
+            color: #059669;
+        }
+
+        .risk-adj {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .risk-high {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                padding: 20px;
+            }
+
+            .dashboard-content {
+                padding: 24px 20px;
+            }
+
+            .new-assessment-card {
+                padding: 24px;
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#ef4444"
+                    stroke="#ef4444" stroke-width="2">
+                    <path
+                        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg>
+                <span>CardioGuard Assistant</span>
+            </div>
+            <div class="nav-right">
+                <span class="user-welcome" id="userWelcome">Welcome back</span>
+                <a href="#" onclick="logout()" class="logout-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            <div class="dashboard-header">
+                <h1>Dashboard</h1>
+                <p>Manage your heart health assessments</p>
+            </div>
+
+            <!-- New Assessment Card -->
+            <a href="{% url 'predict_page' %}" class="new-assessment-card">
+                <div class="plus-icon-container">
+                    <svg class="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <h3>New Assessment</h3>
+                    <p>Start a new AI-powered heart risk evaluation</p>
+                </div>
+            </a>
+
+            <!-- Recent Activity -->
+            <div class="recent-section">
+                <div class="section-header">
+                    <h2>Recent Assessments</h2>
+                </div>
+
+                <div id="loading-state" style="text-align:center; padding: 40px; color: #666;">
+                    Loading history...
+                </div>
+
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <p class="empty-text">You haven't taken any assessments yet</p>
+                    <a href="{% url 'predict_page' %}" class="btn-primary">Take Your First Assessment</a>
+                </div>
+
+                <div id="assessments-list" class="assessment-list" style="display: none;">
+                    <!-- Items will be injected here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/api.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchHistory();
+            fetchUserProfile();
+        });
+
+        async function fetchHistory() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                window.location.href = "{% url 'auth' %}";
+                return;
+            }
+
+            try {
+                // Use authenticatedFetch handling auto-refresh
+                const response = await authenticatedFetch('/api/history/');
+
+                if (response.status === 401) {
+                    // authenticatedFetch handles redirect
+                    return;
+                }
+
+                const data = await response.json();
+                renderHistory(data);
+            } catch (error) {
+                console.error('Error fetching history:', error);
+                // Optionally show error state
+            }
+        }
+
+        async function fetchUserProfile() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                return;
+            }
+
+            try {
+                const response = await authenticatedFetch('/api/me/');
+                if (!response.ok) {
+                    return;
+                }
+
+                const profile = await response.json();
+                const name = (profile.full_name || '').trim() || profile.username || profile.email || '';
+                if (name) {
+                    document.getElementById('userWelcome').textContent = `Welcome back, ${name}`;
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            }
+        }
+
+        function renderHistory(records) {
+            const loading = document.getElementById('loading-state');
+            const empty = document.getElementById('empty-state');
+            const list = document.getElementById('assessments-list');
+
+            loading.style.display = 'none';
+
+            if (!records || records.length === 0) {
+                empty.style.display = 'flex';
+                list.style.display = 'none';
+                return;
+            }
+
+            empty.style.display = 'none';
+            list.style.display = 'flex';
+            list.innerHTML = '';
+
+            records.forEach(record => {
+                const date = new Date(record.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const percentage = parseFloat(record.result).toFixed(1);
+                let badgeClass = 'risk-low';
+                let riskLabel = 'Low Risk';
+
+                if (percentage >= 70) {
+                    badgeClass = 'risk-high';
+                    riskLabel = 'High Risk';
+                } else if (percentage >= 30) {
+                    badgeClass = 'risk-adj';
+                    riskLabel = 'Moderate Risk';
+                }
+
+                const item = document.createElement('a');
+                item.className = 'assessment-item';
+                item.href = `/result/${record.id}/`;
+                item.style.textDecoration = 'none';
+                item.style.color = 'inherit';
+                item.innerHTML = `
+                    <div class="assessment-info">
+                        <div>
+                            <div class="assessment-date">${date}</div>
+                            <div class="assessment-meta">HR: ${record.heart_rate} bpm • BP: ${record.systolic_bp}/${record.diastolic_bp}</div>
+                        </div>
+                    </div>
+                    <div class="risk-badge ${badgeClass}">
+                        ${riskLabel} (${percentage}%)
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            window.location.href = "{% url 'home' %}";
+        }
+    </script>
+</body>
+
+</html>

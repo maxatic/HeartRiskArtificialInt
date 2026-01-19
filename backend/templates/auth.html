@@ -351,6 +351,11 @@
                     <input type="email" name="email" placeholder="Enter your email" required>
                 </div>
 
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" placeholder="Enter your full name" required>
+                </div>
+
                 <div class="form-group" id="doctor-id-group">
                     <label>Doctor ID (optional)</label>
                     <input type="text" name="doctor_id" placeholder="Enter your doctor's ID">
@@ -479,8 +484,16 @@
                     localStorage.setItem('accessToken', result.access);
                     localStorage.setItem('refreshToken', result.refresh);
 
-                    // Redirect to home page
-                    window.location.href = "{% url 'home' %}";
+                    // Redirect to dashboard page based on role
+                    // Check the selected role from the hidden input to be safe
+                    const currentRole = document.getElementById('signin-role').value;
+                    console.log('Login successful, redirecting. Role:', currentRole);
+
+                    if (currentRole === 'doctor') {
+                        window.location.href = "{% url 'doctor_dashboard' %}";
+                    } else {
+                        window.location.href = "{% url 'dashboard' %}";
+                    }
                 } else {
                     alert('Login failed. Please check your credentials.');
                     btn.textContent = originalText;

@@ -16,18 +16,18 @@
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #ffffff;
+            background: #f8fafc;
             color: #1a1a1a;
             line-height: 1.6;
         }
 
         .page-wrapper {
-            background: #ffffff;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
             min-height: 100vh;
         }
 
         .main-container {
-            background: #ffffff;
+            background: transparent;
             overflow: hidden;
             max-width: 1400px;
             margin: 0 auto;
@@ -38,7 +38,9 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 40px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #eef2f7;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(6px);
         }
 
         .logo {
@@ -75,8 +77,9 @@
         }
 
         .btn-primary {
-            background: #1a1a1a;
-            color: white;
+            background: #111827;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
         }
 
         .btn-primary:hover {
@@ -103,8 +106,7 @@
         }
 
         .hero {
-            text-align: center;
-            padding: 80px 40px 60px;
+            padding: 90px 40px 80px;
         }
 
         .badge {
@@ -118,14 +120,23 @@
             margin-bottom: 24px;
         }
 
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+            gap: 40px;
+            align-items: center;
+        }
+
+        .hero-content {
+            text-align: left;
+        }
+
         .hero h1 {
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 700;
             line-height: 1.15;
             margin-bottom: 20px;
             max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
             color: #0f0f0f;
         }
 
@@ -133,37 +144,139 @@
             font-size: 17px;
             color: #666;
             max-width: 700px;
-            margin: 0 auto 32px;
+            margin: 0 0 32px;
             line-height: 1.7;
         }
 
         .hero-buttons {
             display: flex;
             gap: 12px;
-            justify-content: center;
+            justify-content: flex-start;
             margin-bottom: 60px;
         }
 
         .stats {
-            display: flex;
-            justify-content: center;
-            gap: 180px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            max-width: 520px;
         }
 
         .stat {
-            text-align: center;
+            text-align: left;
+            padding: 16px 18px;
+            background: #ffffff;
+            border: 1px solid #eef2f7;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
         }
 
         .stat-value {
             font-size: 36px;
             font-weight: 700;
             color: #1a1a1a;
+            white-space: nowrap;
         }
 
         .stat-label {
             font-size: 14px;
             color: #888;
             margin-top: 4px;
+        }
+
+        .hero-visual {
+            background: #ffffff;
+            border-radius: 24px;
+            border: 1px solid #eef2f7;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+            position: relative;
+            cursor: default;
+            pointer-events: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hero-visual:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 26px 60px rgba(15, 23, 42, 0.16);
+        }
+
+        .visual-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .visual-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .visual-pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #ecfdf3;
+            color: #16a34a;
+        }
+
+        .visual-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .visual-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .visual-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .metric-pill {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #475569;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: none;
+        }
+
+        .metric-pill span {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .visual-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #111827;
+            color: #fff;
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: none;
+        }
+
+        .visual-footer strong {
+            font-size: 18px;
         }
 
         .how-it-works {
@@ -494,6 +607,81 @@
             color: white;
         }
 
+        .faq {
+            padding: 80px 40px 60px;
+            text-align: center;
+        }
+
+        .faq-list {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .faq-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: #ffffff;
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .faq-item.open {
+            border-color: #cbd5f5;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .faq-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-size: 18px;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .faq-item.open .faq-icon {
+            background: #e0e7ff;
+            color: #3730a3;
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+            padding: 0 22px;
+        }
+
+        .faq-answer p {
+            margin: 0 0 18px;
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
         @media (max-width: 768px) {
             .nav {
                 padding: 16px 20px;
@@ -508,7 +696,11 @@
             }
 
             .stats {
-                gap: 60px;
+                grid-template-columns: 1fr;
+            }
+
+            .hero-grid {
+                grid-template-columns: 1fr;
             }
 
             .steps {
@@ -553,26 +745,49 @@
             </div>
 
             <section class="hero">
-                <div class="badge">AI-Powered Heart Attack Risk Assessment</div>
-                <h1>Understand Your Heart Attack Risk with an Advanced Machine Analysis</h1>
-                <p>Our machine-based system reviews your health information and provides a clear, data-driven estimate
-                    of your heart attack risk - fast, simple, and easy to understand.</p>
-                <div class="hero-buttons">
-                    <a href="{% url 'auth' %}" class="btn btn-primary">Start Free Assessment</a>
-                    <a href="#how-it-works" class="btn btn-secondary">Learn More</a>
-                </div>
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-value">98%</div>
-                        <div class="stat-label">Prediction Accuracy</div>
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <div class="badge">AI-Powered Heart Attack Risk Assessment</div>
+                        <h1>Know your heart risk in minutes, backed by data.</h1>
+                        <p>CardioGuard analyzes your health metrics and produces a clear, explainable risk score with
+                            factor-by-factor insight — fast, private, and easy to understand.</p>
+                        <div class="hero-buttons">
+                            <a href="{% url 'auth' %}" class="btn btn-primary">Start Free Assessment</a>
+                            <a href="#how-it-works" class="btn btn-secondary">Learn More</a>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">98%</div>
+                                <div class="stat-label">Prediction Accuracy</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">&lt;30 sec</div>
+                                <div class="stat-label">Instant Results</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">24/7</div>
+                                <div class="stat-label">Available Anytime</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat">
-                        <div class="stat-value">&lt;30 sec</div>
-                        <div class="stat-label">Instant Results</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-value">24/7</div>
-                        <div class="stat-label">Available Anytime</div>
+                    <div class="hero-visual">
+                        <div class="visual-header">
+                            <div class="visual-title">Assessment Snapshot</div>
+                            <div class="visual-pill">Low Risk</div>
+                        </div>
+                        <div class="visual-card">
+                            <h4>Your Health Metrics</h4>
+                            <div class="visual-metrics">
+                                <div class="metric-pill">Age <span>32</span></div>
+                                <div class="metric-pill">Heart Rate <span>72</span></div>
+                                <div class="metric-pill">Systolic BP <span>118</span></div>
+                                <div class="metric-pill">Blood Sugar <span>92</span></div>
+                            </div>
+                        </div>
+                        <div class="visual-footer">
+                            <div>Risk Score</div>
+                            <strong>18.4%</strong>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -688,6 +903,7 @@
                     .theme-blue .step-number {
                         background: linear-gradient(135deg, #3b82f6, #60a5fa);
                         -webkit-background-clip: text;
+                        background-clip: text;
                         -webkit-text-fill-color: transparent;
                         opacity: 0.2;
                     }
@@ -700,6 +916,7 @@
                     .theme-purple .step-number {
                         background: linear-gradient(135deg, #8b5cf6, #a78bfa);
                         -webkit-background-clip: text;
+                        background-clip: text;
                         -webkit-text-fill-color: transparent;
                         opacity: 0.2;
                     }
@@ -712,6 +929,7 @@
                     .theme-green .step-number {
                         background: linear-gradient(135deg, #10b981, #34d399);
                         -webkit-background-clip: text;
+                        background-clip: text;
                         -webkit-text-fill-color: transparent;
                         opacity: 0.2;
                     }
@@ -735,6 +953,112 @@
                         margin-bottom: 0;
                     }
 
+                    .process-slider {
+                        max-width: 900px;
+                        margin: 0 auto;
+                        background: #ffffff;
+                        border: 1px solid #e5e7eb;
+                        border-radius: 24px;
+                        padding: 32px;
+                        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+                    }
+
+                    .process-slide {
+                        display: none;
+                    }
+
+                    .process-slide.active {
+                        display: block;
+                    }
+
+                    .process-meta {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 10px;
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: #6b7280;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        margin-bottom: 12px;
+                    }
+
+                    .process-meta span {
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 999px;
+                        background: #f3f4f6;
+                        color: #111827;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 12px;
+                    }
+
+                    .process-title {
+                        font-size: 22px;
+                        font-weight: 700;
+                        color: #111827;
+                        margin-bottom: 10px;
+                    }
+
+                    .process-text {
+                        font-size: 15px;
+                        color: #6b7280;
+                        line-height: 1.7;
+                        margin-bottom: 0;
+                    }
+
+                    .process-controls {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 12px;
+                        margin-top: 28px;
+                    }
+
+                    .process-btn {
+                        border: 1px solid #e5e7eb;
+                        background: #ffffff;
+                        color: #111827;
+                        padding: 10px 16px;
+                        border-radius: 10px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        font-family: inherit;
+                    }
+
+                    .process-btn:hover {
+                        background: #f8fafc;
+                    }
+
+                    .process-btn:disabled {
+                        color: #9ca3af;
+                        cursor: not-allowed;
+                    }
+
+                    .process-dots {
+                        display: flex;
+                        gap: 8px;
+                        flex: 1;
+                        justify-content: center;
+                    }
+
+                    .process-dot {
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 999px;
+                        background: #e5e7eb;
+                        transition: all 0.2s ease;
+                    }
+
+                    .process-dot.active {
+                        width: 24px;
+                        background: #111827;
+                    }
+
                     @media (max-width: 900px) {
                         .steps-container {
                             grid-template-columns: 1fr;
@@ -744,44 +1068,54 @@
                         .steps-container::before {
                             display: none;
                         }
+
+                        .process-slider {
+                            padding: 24px;
+                        }
+
+                        .process-controls {
+                            flex-wrap: wrap;
+                        }
                     }
                 </style>
 
                 <h2 class="section-title">How It Works</h2>
                 <p class="section-subtitle">Simple, fast, and accurate health risk assessment</p>
-                <div class="steps">
-                    <div class="step-card">
-                        <div class="step-icon blue">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                            </svg>
-                        </div>
-                        <h3>Enter Health Data</h3>
-                        <p>Input your health parameters including blood pressure, cholesterol, and other vital signs.
-                        </p>
+                <div class="process-slider" id="processSlider">
+                    <div class="process-slide active">
+                        <div class="process-meta"><span>1</span> Register</div>
+                        <div class="process-title">Create a secure account in seconds.</div>
+                        <p class="process-text">Sign up with your email to keep your assessments private and easy to
+                            access later.</p>
                     </div>
-                    <div class="step-card">
-                        <div class="step-icon purple">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                                <polyline points="16 7 22 7 22 13" />
-                            </svg>
-                        </div>
-                        <h3>Machine Analysis</h3>
-                        <p>Our machine system processes your inputs and calculates your heart attack risk using
-                            validated medical data.</p>
+                    <div class="process-slide">
+                        <div class="process-meta"><span>2</span> Enter Metrics</div>
+                        <div class="process-title">Fill in your health data accurately.</div>
+                        <p class="process-text">Provide your blood pressure, heart rate, blood sugar, and biomarkers to
+                            power the model.</p>
                     </div>
-                    <div class="step-card">
-                        <div class="step-icon green">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10" />
-                            </svg>
-                        </div>
-                        <h3>Instant Results</h3>
-                        <p>Receive a clear risk assessment score and personalized recommendations immediately.</p>
+                    <div class="process-slide">
+                        <div class="process-meta"><span>3</span> Analyze</div>
+                        <div class="process-title">Our model evaluates your risk.</div>
+                        <p class="process-text">The AI model scores your inputs and calculates your personalized risk
+                            percentage.</p>
+                    </div>
+                    <div class="process-slide">
+                        <div class="process-meta"><span>4</span> Review Results</div>
+                        <div class="process-title">Understand what drives your score.</div>
+                        <p class="process-text">See the contribution of each metric and track your assessment history
+                            over time.</p>
+                    </div>
+                    <div class="process-slide">
+                        <div class="process-meta"><span>5</span> Consult</div>
+                        <div class="process-title">Share results with a professional.</div>
+                        <p class="process-text">Use the report as a starting point for a discussion with your doctor
+                            or specialist.</p>
+                    </div>
+                    <div class="process-controls">
+                        <button class="process-btn" id="processPrev" type="button">Previous</button>
+                        <div class="process-dots" id="processDots"></div>
+                        <button class="process-btn" id="processNext" type="button">Next</button>
                     </div>
                 </div>
             </section>
@@ -846,6 +1180,73 @@
                 </div>
             </section>
 
+            <section class="faq" id="faq">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle">Quick answers about the assessment and your data</p>
+                <div class="faq-list" id="faqList">
+                    <div class="faq-item">
+                        <button class="faq-question" type="button">
+                            How accurate is the risk assessment?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>CardioGuard uses a model trained on clinical datasets. It provides a risk estimate for
+                                informational use and should not replace professional diagnosis.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button">
+                            Is my data stored securely?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Your assessments are tied to your account. We never sell your data, and access is
+                                protected by authentication.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button">
+                            What inputs do I need to provide?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Basic inputs include age, gender, heart rate, blood pressure, blood sugar, and optional
+                                biomarkers like CK-MB and troponin.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button">
+                            Can I track changes over time?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes. Each assessment is saved to your dashboard so you can compare your risk trend over
+                                time.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button">
+                            Does this replace a doctor?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. This tool is for educational insight. Always consult a qualified healthcare
+                                provider for medical advice.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button class="faq-question" type="button">
+                            Can I share results with a doctor?
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes. You can open any assessment from your dashboard and share the risk score and
+                                breakdown with your healthcare provider.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="cta">
                 <h2>Ready to Take Control of Your Heart Health?</h2>
                 <p>Get your personalized risk assessment in less than a minute</p>
@@ -892,7 +1293,7 @@
         function updateNavForLoggedInUser() {
             const navButtons = document.querySelector('.nav-buttons');
             navButtons.innerHTML = `
-                <a href="#" class="btn btn-primary">Dashboard</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a>
                 <button onclick="logout()" class="btn btn-secondary" style="border: 1px solid #e0e0e0; background: transparent;">Logout</button>
             `;
         }
@@ -936,8 +1337,90 @@
             setInterval(refreshAccessToken, REFRESH_INTERVAL);
         }
 
+        function initProcessSlider() {
+            const slider = document.getElementById('processSlider');
+            if (!slider) return;
+
+            const slides = Array.from(slider.querySelectorAll('.process-slide'));
+            const prevBtn = document.getElementById('processPrev');
+            const nextBtn = document.getElementById('processNext');
+            const dotsContainer = document.getElementById('processDots');
+
+            if (!slides.length || !prevBtn || !nextBtn || !dotsContainer) return;
+
+            let activeIndex = 0;
+            const dots = slides.map((_, index) => {
+                const dot = document.createElement('span');
+                dot.className = 'process-dot';
+                dot.addEventListener('click', () => {
+                    activeIndex = index;
+                    updateSlider();
+                });
+                dotsContainer.appendChild(dot);
+                return dot;
+            });
+
+            function updateSlider() {
+                slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === activeIndex);
+                });
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === activeIndex);
+                });
+                prevBtn.disabled = activeIndex === 0;
+                nextBtn.disabled = activeIndex === slides.length - 1;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (activeIndex > 0) {
+                    activeIndex -= 1;
+                    updateSlider();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (activeIndex < slides.length - 1) {
+                    activeIndex += 1;
+                    updateSlider();
+                }
+            });
+
+            updateSlider();
+        }
+
+        function initFaq() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            if (!faqItems.length) return;
+
+            faqItems.forEach((item) => {
+                const button = item.querySelector('.faq-question');
+                const answer = item.querySelector('.faq-answer');
+                if (!button || !answer) return;
+
+                button.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    faqItems.forEach((other) => {
+                        other.classList.remove('open');
+                        const otherAnswer = other.querySelector('.faq-answer');
+                        if (otherAnswer) {
+                            otherAnswer.style.maxHeight = null;
+                        }
+                    });
+
+                    if (!isOpen) {
+                        item.classList.add('open');
+                        answer.style.maxHeight = `${answer.scrollHeight + 24}px`;
+                    }
+                });
+            });
+        }
+
         // Initialize on load
-        document.addEventListener('DOMContentLoaded', checkLoginState);
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginState();
+            initProcessSlider();
+            initFaq();
+        });
     </script>
 </body>
 
