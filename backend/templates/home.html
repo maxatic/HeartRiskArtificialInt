@@ -347,6 +347,102 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
+        .top-footer {
+            background: linear-gradient(135deg, #ef4444 0%, #7c3aed 50%, #3b82f6 100%);
+            padding: 32px 72px;
+            border-radius: 0 0 24px 24px;
+            margin: 0 24px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.3);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .top-footer-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .top-footer-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .top-footer-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-footer .feature {
+            background: transparent;
+            padding: 0;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-footer .feature h4 {
+            color: white;
+            font-size: 15px;
+            margin: 0 0 2px 0;
+            font-weight: 700;
+        }
+
+        .top-footer .feature p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .top-footer .feature-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-top-nav {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-top-nav:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 900px) {
+            .top-footer-center {
+                display: none;
+            }
+        }
+
         .footer {
             background: #1a1a2e;
             padding: 40px;
@@ -439,19 +535,22 @@
 <body>
     <div class="page-wrapper">
         <div class="main-container">
-            <nav class="nav">
-                <div class="logo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#e53e3e"
-                        stroke="#e53e3e" stroke-width="2">
+            <div class="top-footer">
+                <a href="#" class="top-footer-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"
+                        stroke="white" stroke-width="2">
                         <path
                             d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                     </svg>
-                    <span>CardioGuard Assistant</span>
+                    <span>CardioGuard</span>
+                </a>
+
+
+
+                <div class="top-footer-right nav-buttons">
+                    <a href="{% url 'auth' %}" class="btn-top-nav">Login / Sign Up</a>
                 </div>
-                <div class="nav-buttons">
-                    <a href="{% url 'auth' %}" class="btn btn-secondary">Login / Sign Up</a>
-                </div>
-            </nav>
+            </div>
 
             <section class="hero">
                 <div class="badge">AI-Powered Heart Attack Risk Assessment</div>
@@ -741,7 +840,7 @@
                         </div>
                         <div>
                             <h4>Fast & Simple</h4>
-                            <p>Get your risk score in minutes.</p>
+                            <p>Get your risk score in less than a minute</p>
                         </div>
                     </div>
                 </div>
