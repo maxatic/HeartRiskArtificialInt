@@ -188,12 +188,32 @@ def result_page(request, record_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_patient(request):
-    """API to add a new patient for the logged-in doctor."""
-    serializer = PatientSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(doctor=request.user)
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+    """API to add a new patient for the logged-in doctor by email."""
+    email = request.data.get('email')
+    if not email:
+        return Response({"error": "Email is required"}, status=400)
+    
+    # Find user by email
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({"error": "User with this email not found. Please ask patient to sign up first."}, status=404)
+    
+    # Check if already added
+    if Patient.objects.filter(doctor=request.user, user=user).exists():
+         return Response({"error": "Patient already added"}, status=400)
+
+    # Create link
+    # We can optionally accept age/patient_id if sent, but mainly just email is used now.
+    patient = Patient.objects.create(
+        doctor=request.user,
+        user=user,
+        patient_id=request.data.get('patient_id'),
+        age=request.data.get('age')
+    )
+    
+    serializer = PatientSerializer(patient)
+    return Response(serializer.data, status=201)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -201,4 +221,19 @@ def get_doctor_patients(request):
     """API to get list of patients for the logged-in doctor."""
     patients = Patient.objects.filter(doctor=request.user).order_by('-created_at')
     serializer = PatientSerializer(patients, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_specific_patient_history(request, patient_id):
+    """
+    API for DOCTORS to view the history of a specific patient they have added.
+    patient_id is the ID of the Patient record (not the User ID).
+    """
+    # Verify the patient belongs to this doctor
+    patient_record = get_object_or_404(Patient, id=patient_id, doctor=request.user)
+    target_user = patient_record.user
+    
+    records = MedicalRecord.objects.filter(user=target_user).order_by('-created_at')
+    serializer = MedicalRecordSerializer(records, many=True)
     return Response(serializer.data)

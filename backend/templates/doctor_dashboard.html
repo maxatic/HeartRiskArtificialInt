@@ -607,36 +607,34 @@
                 </button>
             </div>
             <form id="add-patient-form" onsubmit="submitPatient(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" name="first_name" placeholder="John" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" placeholder="Doe" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" placeholder="john.doe@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="tel" name="phone" placeholder="(555) 123-4567">
-                    </div>
-                </div>
                 <div class="form-group">
-                    <label>Patient ID (Optional)</label>
-                    <input type="text" name="patient_id" placeholder="e.g. P001">
+                    <label>Patient Email</label>
+                    <input type="email" name="email" placeholder="patient@example.com" required>
+                    <p style="font-size:12px; color:#6b7280; margin-top:4px;">Patient must already have an account.</p>
                 </div>
-                <!-- Hidden inputs if needed, e.g. email/phone for future -->
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-submit" id="submit-btn">Add Patient</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Assessment History</h3>
+                <button class="close-btn" onclick="closeHistoryModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div id="history-content" style="max-height: 400px; overflow-y: auto;">
+                <p>Loading...</p>
+            </div>
         </div>
     </div>
 
@@ -665,7 +663,7 @@
         function renderPatients(patients) {
             const list = document.getElementById('patient-list');
             const emptyState = document.getElementById('empty-state');
-            const countElement = document.querySelector('.stat-valid'); // Assumes first stat-valid is 'Total Patients'
+            const countElement = document.querySelector('.stat-valid'); 
 
             // Update Count
             if (countElement) countElement.textContent = patients.length;
@@ -681,7 +679,9 @@
             list.innerHTML = '';
 
             patients.forEach(p => {
-                const initials = (p.first_name[0] + p.last_name[0]).toUpperCase();
+                const fName = p.first_name || '';
+                const lName = p.last_name || '';
+                const initials = (fName && lName) ? (fName[0] + lName[0]).toUpperCase() : '??';
                 const idBadge = p.patient_id ? `<span class="patient-id-badge">${p.patient_id}</span>` : '';
 
                 const item = document.createElement('div');
@@ -690,10 +690,13 @@
                     <div class="patient-info">
                         <div class="patient-avatar">${initials}</div>
                         <div class="patient-details">
-                            <h3>${p.first_name} ${p.last_name} ${idBadge}</h3>
-                            <p>${p.email || 'No email'} • ${p.phone || 'No phone'}</p>
+                            <h3>${fName} ${lName} ${idBadge}</h3>
+                            <p>${p.email || 'No email'}</p>
                         </div>
                     </div>
+                    <button onclick="viewHistory(${p.id})" class="logout-btn" style="border:1px solid #e5e7eb; font-size:13px;">
+                        Assessment History
+                    </button>
                 `;
                 list.appendChild(item);
             });
@@ -707,7 +710,8 @@
             btn.disabled = true;
 
             const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
+            // Only convert fields present in form (email only)
+            const data = Object.fromEntries(formData.entries()); 
             const token = localStorage.getItem('accessToken');
 
             try {
@@ -725,7 +729,8 @@
                     e.target.reset();
                     fetchPatients(); // Reload list
                 } else {
-                    alert("Failed to add patient");
+                    const err = await response.json();
+                    alert(err.error || "Failed to add patient");
                 }
             } catch (error) {
                 console.error("Error:", error);
@@ -789,6 +794,74 @@
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             window.location.href = "{% url 'home' %}";
+        }
+
+        /* History Modal Logic */
+        async function viewHistory(patientId) {
+            const modal = document.getElementById('historyModal');
+            const content = document.getElementById('history-content');
+            modal.classList.add('active');
+            content.innerHTML = '<p style="text-align:center; color:#666;">Loading history...</p>';
+
+            const token = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch(`/api/patients/${patientId}/history/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const records = await response.json();
+                    renderHistory(records);
+                } else {
+                    content.innerHTML = '<p style="text-align:center; color:red;">Failed to load history.</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                content.innerHTML = '<p style="text-align:center; color:red;">Error loading history.</p>';
+            }
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.remove('active');
+        }
+
+            // Close on backdrop click for history modal
+        document.getElementById('historyModal').addEventListener('click', (e) => {
+            if (e.target.id === 'historyModal') closeHistoryModal();
+        });
+
+        function renderHistory(records) {
+            const content = document.getElementById('history-content');
+            if (records.length === 0) {
+                content.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">No assessments found for this patient.</p>';
+                return;
+            }
+            
+            let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+            records.forEach(r => {
+                const date = new Date(r.created_at).toLocaleDateString();
+                const score = r.result ? r.result.toFixed(1) + '%' : 'N/A';
+                const color = (r.result && r.result > 50) ? '#ef4444' : '#10b981';
+                
+                html += `
+                    <div style="padding:16px; border:1px solid #f0f0f0; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:600; font-size:14px; margin-bottom:4px;">Assessment on ${date}</div>
+                            <div style="font-size:13px; color:#6b7280;">
+                                Age: ${r.age}, BP: ${r.systolic_bp}/${r.diastolic_bp}
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="display:inline-block; padding:4px 8px; background:${color}15; color:${color}; border-radius:6px; font-weight:600; font-size:14px;">
+                                Risk: ${score}
+                            </span>
+                            <br>
+                            <a href="/result/${r.id}/" style="display:inline-block; margin-top:4px; font-size:12px; color:#666; text-decoration:none;">View Details &rarr;</a>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            content.innerHTML = html;
         }
     </script>
 </body>
