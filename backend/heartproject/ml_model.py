@@ -18,6 +18,9 @@ DATA_PATH = BASE_DIR / 'data' / 'Medicaldataset.csv'
 MODEL_PATH = BASE_DIR / 'data' / 'heart_model.joblib'
 SCALER_PATH = BASE_DIR / 'data' / 'scaler.joblib'
 
+MODEL_PATH_REDUCED = BASE_DIR / 'data' / 'heart_model_reduced.joblib'
+SCALER_PATH_REDUCED = BASE_DIR / 'data' / 'scaler_reduced.joblib'
+
 # Feature columns in order
 FEATURE_COLUMNS = [
     'Age', 'Gender', 'Heart rate', 
@@ -25,20 +28,28 @@ FEATURE_COLUMNS = [
     'Blood sugar', 'CK-MB', 'Troponin'
 ]
 
+# Reduced features (excluding 'CK-MB' and 'Troponin' which are at indices 6 and 7 in zero-indexed list)
+FEATURE_COLUMNS_REDUCED = [
+    'Age', 'Gender', 'Heart rate', 
+    'Systolic blood pressure', 'Diastolic blood pressure',
+    'Blood sugar'
+]
 
-def load_and_prepare_data():
+
+def load_and_prepare_data(feature_columns):
     df = pd.read_csv(DATA_PATH)
     
     # Features (X) and target (y)
-    X = df[FEATURE_COLUMNS]
+    X = df[feature_columns]
     y = (df['Result'] == 'positive').astype(int) # 1 for positive, 0 for negative
     
     return X, y
 
 
-def train_model(test_size=0.2, random_state=42):
+def train_model(feature_columns=FEATURE_COLUMNS, model_path=MODEL_PATH, scaler_path=SCALER_PATH, test_size=0.2, random_state=42):
     
-    X, y = load_and_prepare_data()
+    print(f"Training model with {len(feature_columns)} features: {feature_columns}")
+    X, y = load_and_prepare_data(feature_columns)
 
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(
@@ -62,41 +73,54 @@ def train_model(test_size=0.2, random_state=42):
     y_pred = model.predict(X_test_scaled)
     accuracy = accuracy_score(y_test, y_pred)
     
-    print(f"\nAccuracy: {accuracy:.4f}")
+    print(f"Accuracy (Random Forest): {accuracy:.4f}")
     
     # Save model AND scaler
-    joblib.dump(model, MODEL_PATH)
-    joblib.dump(scaler, SCALER_PATH)
-    print(f"Model saved to {MODEL_PATH}")
-    print(f"Scaler saved to {SCALER_PATH}")
-    
+    joblib.dump(model, model_path)
+    joblib.dump(scaler, scaler_path)
+    print(f"Model saved to {model_path}")
+    print(f"Scaler saved to {scaler_path}\n")
 
-def load_model_and_scaler():
-    if not MODEL_PATH.exists() or not SCALER_PATH.exists():
+
+
+
+
+def load_model_and_scaler(model_path=MODEL_PATH, scaler_path=SCALER_PATH):
+    if not model_path.exists() or not scaler_path.exists():
         raise FileNotFoundError(
-            "Model or scaler not found. "
+            f"Model or scaler not found at {model_path} / {scaler_path}. "
             "Please run train_model() first."
         )
-    model = joblib.load(MODEL_PATH)
-    scaler = joblib.load(SCALER_PATH)
+    model = joblib.load(model_path)
+    scaler = joblib.load(scaler_path)
     return model, scaler
 
 
-def predict_risk(data):
+def predict_risk(data, use_reduced_model=False):
     """
     Predicts heart disease risk percentage for a single patient.
     
     Args:
         data (dict): Dictionary containing patient data with keys matching FEATURE_COLUMNS
+        use_reduced_model (bool): If True, use the reduced model (6 features)
         
     Returns:
         float: Risk percentage (0-100)
     """
-    model, scaler = load_model_and_scaler()
+    if use_reduced_model:
+        current_features = FEATURE_COLUMNS_REDUCED
+        current_model_path = MODEL_PATH_REDUCED
+        current_scaler_path = SCALER_PATH_REDUCED
+    else:
+        current_features = FEATURE_COLUMNS
+        current_model_path = MODEL_PATH
+        current_scaler_path = SCALER_PATH
+
+    model, scaler = load_model_and_scaler(current_model_path, current_scaler_path)
     
     # Ensure data is in correct order
     input_data = []
-    for col in FEATURE_COLUMNS:
+    for col in current_features:
         if col not in data:
             raise ValueError(f"Missing required field: {col}")
         input_data.append(data[col])
@@ -114,6 +138,9 @@ def predict_risk(data):
     # We use TreeExplainer for Random Forest
     # Note: shap_values for classification often return a list [values_for_class_0, values_for_class_1]
     # We want class 1 (postive risk)
+    # NOTE: SHAP TreeExplainer works well for Trees. 
+    # If we switch to SVM globally, we'd need KernelExplainer. 
+    # For now, we assume the saved model is still Random Forest.
     explainer = shap.TreeExplainer(model)
     shap_vals = explainer.shap_values(scaled_input)
     
@@ -130,10 +157,17 @@ def predict_risk(data):
     # Create a dictionary of Feature Name -> SHAP Value
     # This explains how much each feature contributed to the risk score calculation
     shap_dict = {}
-    for i, col in enumerate(FEATURE_COLUMNS):
+    for i, col in enumerate(current_features):
         shap_dict[col] = float(shap_vals_class_1[i])
 
     return probability * 100, shap_dict
 
 if __name__ == '__main__':
-    train_model()
+    # Standard training (saves models)
+    print("Training Full Model (8 features)...")
+    train_model(FEATURE_COLUMNS, MODEL_PATH, SCALER_PATH)
+    
+    print("Training Reduced Model (6 features - No CK-MB/Troponin)...")
+    train_model(FEATURE_COLUMNS_REDUCED, MODEL_PATH_REDUCED, SCALER_PATH_REDUCED)
+
+
