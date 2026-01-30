@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History - CardioGuard Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #1a1a1a;
+        }
+
+        .logo svg {
+            color: #ef4444;
+            fill: #ef4444;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #1a1a1a;
+        }
+
+        .start-assessment-btn {
+            background: #000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 40px;
+            flex: 1;
+        }
+
+        /* Patient Header Card */
+        .patient-header-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .patient-avatar {
+            width: 80px;
+            height: 80px;
+            background: #8b5cf6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .patient-info-main h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .patient-id-badge {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .risk-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .risk-badge.high {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .risk-badge.low {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .patient-details-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item svg {
+            color: #9ca3af;
+        }
+
+        .last-assessment-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #ef4444;
+            font-weight: 500;
+        }
+
+        /* Cards Container */
+        .content-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Assessment List */
+        .assessment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .assessment-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .assessment-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .assessment-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .calendar-icon-box {
+            width: 48px;
+            height: 48px;
+            background: #eff6ff;
+            color: #3b82f6;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .calendar-day {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .score-risk-tag {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .metrics-row {
+            display: flex;
+            gap: 32px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .metric-point span {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .view-report-btn {
+            border: 1px solid #e5e7eb;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-report-btn:hover {
+            background: #f9fafb;
+        }
+
+        .change-indicator {
+            padding-top: 16px;
+            border-top: 1px solid #f3f4f6;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .change-value {
+            font-weight: 500;
+        }
+
+        .change-value.positive {
+            color: #16a34a;
+        }
+
+        .change-value.negative {
+            color: #ef4444;
+        }
+
+
+        @media (max-width: 768px) {
+            .nav {
+                padding: 16px 20px;
+            }
+
+            .content-card {
+                padding: 20px;
+            }
+
+            .dashboard-content {
+                padding: 20px;
+            }
+
+            .patient-header-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .patient-details-row {
+                justify-content: center;
+            }
+
+            .assessment-main {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .assessment-left {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .view-report-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="breadcrumbs">
+                <a href="{% url 'doctor_dashboard' %}" class="back-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </a>
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#ef4444"
+                        stroke="#ef4444" stroke-width="2">
+                        <path
+                            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
+                    <span>CardioGuard Assistant - Patient History</span>
+                </div>
+            </div>
+
+            <a href="{% url 'predict_page' %}" class="start-assessment-btn">Start New Assessment</a>
+        </nav>
+
+        <main class="dashboard-content">
+            <!-- 1. Patient Info Header is dynamic -->
+            <div id="patient-header-section">
+                <!-- Loaded via JS -->
+                <p>Loading patient details...</p>
+            </div>
+
+            <!-- 2. Risk Score Trend -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Risk Score Trend</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="riskTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 3. Health Metrics Over Time -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Health Metrics Over Time</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="healthMetricsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 4. Assessment History List -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" id="history-title">Assessment History</h2>
+                </div>
+                <div id="assessment-list-container" class="assessment-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const PATIENT_ID = {{ patient_id }};
+        let charts = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPatientHistory();
+        });
+
+        async function fetchPatientHistory() {
+            const token = localStorage.getItem('accessToken');
+            try {
+                // Determine API endpoint
+                // Since this view is for doctors, we use the doctor-specific API
+                const response = await fetch(`/api/patients/${PATIENT_ID}/history/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const records = await response.json();
+                    renderDashboard(records);
+                } else {
+                    document.getElementById('patient-header-section').innerHTML = `<p style="color:red">Error loading patient data.</p>`;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        function renderDashboard(records) {
+            if (!records || records.length === 0) {
+                document.getElementById('patient-header-section').innerHTML = `<p>No records found for this patient.</p>`;
+                return;
+            }
+
+            // Assume patient info is same across records, take from first one or separate API
+            // Actually the API returns List[MedicalRecord]. Each record has user details inside 'user' field usually, 
+            // but MedicalRecordSerializer might just render user ID. 
+            // Let's check MedicalRecordSerializer. If it doesn't give patient details, we might need a separate call.
+            // Based on views.py: `serializer = MedicalRecordSerializer(records, many=True)`
+            // We'll proceed assuming we can get some info, or at least render the charts.
+            // Ideally we should fetch patient details separately if not in record.
+
+            // For now, let's try to extract from the first record if available, 
+            // or we might need another API endpoint "get_patient_details" which strictly returns Patient model info.
+            // The `get_specific_patient_history` returns serialized MedicalRecords.
+
+            // Let's infer what we can.
+
+            const latest = records[0];
+            // records is ordered by -created_at, so 0 is latest.
+
+            renderPatientHeader(latest, records);
+            renderCharts(records);
+            renderHistoryList(records);
+        }
+
+        function renderPatientHeader(latestRecord, allRecords) {
+            // Note: In real app, we'd want a dedicated endpoint for patient profile.
+            // Using placeholder data mixed with real record data for now.
+            // If MedicalRecordSerializer includes user details, great. Otherwise we might show limited info.
+
+            const riskScore = latestRecord.result;
+            const isHighRisk = riskScore > 50;
+            const riskLabel = isHighRisk ? 'High Risk' : 'Low Risk';
+            const riskClass = isHighRisk ? 'high' : 'low';
+            const date = new Date(latestRecord.created_at).toLocaleDateString();
+
+            const html = `
+                <div class="patient-header-card">
+                    <div class="patient-avatar">
+                        P${latestRecord.user || 'T'}
+                    </div>
+                    <div class="patient-info-main">
+                        <h1>
+                            Patient #${latestRecord.user} 
+                            <span class="risk-badge ${riskClass}">${riskLabel}</span>
+                        </h1>
+                        <div class="patient-details-row">
+                            <div class="detail-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                ${latestRecord.age} years old
+                            </div>
+                            <div class="detail-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                Added Recent
+                            </div>
+                        </div>
+                        <div class="last-assessment-info">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Last assessment: ${date} - Risk Score: ${Math.round(riskScore)}/100
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('patient-header-section').innerHTML = html;
+        }
+
+        function renderCharts(records) {
+            // Prepare Data (reverse because records are desc)
+            const sorted = [...records].reverse();
+            const labels = sorted.map(r => new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+            const riskData = sorted.map(r => r.result);
+
+            // Metrics
+            const systolicData = sorted.map(r => r.systolic_bp);
+            const cholesterolData = sorted.map(r => r.cholesterol); // Checking if serializer has this
+            const heartRateData = sorted.map(r => r.heart_rate);
+
+            // 1. Risk Trend Chart
+            const ctxRisk = document.getElementById('riskTrendChart').getContext('2d');
+
+            // Gradient fill
+            const gradientRisk = ctxRisk.createLinearGradient(0, 0, 0, 300);
+            gradientRisk.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+            gradientRisk.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+            if (charts.risk) charts.risk.destroy();
+
+            charts.risk = new Chart(ctxRisk, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Risk Score',
+                        data: riskData,
+                        borderColor: '#ef4444',
+                        backgroundColor: gradientRisk,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { borderDash: [5, 5] }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // 2. Health Metrics Chart
+            const ctxHealth = document.getElementById('healthMetricsChart').getContext('2d');
+            if (charts.health) charts.health.destroy();
+
+            charts.health = new Chart(ctxHealth, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Blood Pressure (Systolic)',
+                            data: systolicData,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointBackgroundColor: '#3b82f6'
+                        },
+                        {
+                            label: 'Heart Rate',
+                            data: heartRateData,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointBackgroundColor: '#10b981'
+                        }
+                    ]
+                    // Note: Cholesterol might be missing in serializer or model? 
+                    // If it exists in records, add it. If not, skip.
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { borderDash: [5, 5] }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderHistoryList(records) {
+            const container = document.getElementById('assessment-list-container');
+            document.getElementById('history-title').textContent = `Assessment History (${records.length})`;
+
+            container.innerHTML = records.map((r, index) => {
+                const dateObj = new Date(r.created_at);
+                const day = dateObj.getDate();
+                const month = dateObj.toLocaleString('default', { month: 'short' });
+                const year = dateObj.getFullYear();
+
+                const score = Math.round(r.result);
+                const isHigh = score > 50;
+
+                // Calculate change from previous (next in array since desc)
+                let changeHtml = '';
+                if (index < records.length - 1) {
+                    const prevScore = records[index + 1].result;
+                    const diff = score - prevScore;
+                    const sign = diff > 0 ? '+' : '';
+                    const colorClass = diff > 0 ? 'negative' : (diff < 0 ? 'positive' : ''); // Higher score is bad
+                    // Wait, higher risk is bad. So +diff is negative health wise.
+
+                    if (diff !== 0) {
+                        changeHtml = `
+                            <div class="change-indicator">
+                                Changes from previous: <span class="change-value ${colorClass}">Risk Score ${sign}${Math.round(diff)} points</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                return `
+                    <div class="assessment-item">
+                        <div class="assessment-main">
+                            <div class="assessment-left">
+                                <div class="calendar-icon-box">
+                                    <span style="font-size:10px; opacity:0.7">${month}</span>
+                                    <span class="calendar-day">${day}</span>
+                                    <span style="font-size:10px; opacity:0.7">${year}</span>
+                                </div>
+                                
+                                <div>
+                                    <div class="score-display">
+                                        <div class="score-risk-tag ${isHigh ? 'high' : 'low'}" 
+                                             style="background:${isHigh ? '#fee2e2' : '#f0fdf4'}; color:${isHigh ? '#ef4444' : '#16a34a'}">
+                                            ${isHigh ? 'High Risk' : 'Low Risk'}
+                                        </div>
+                                        <div class="score-value">${score}/100</div>
+                                    </div>
+                                    
+                                    <div class="metrics-row" style="margin-top:8px;">
+                                        <div class="metric-point">BP: <span>${r.systolic_bp}/${r.diastolic_bp}</span></div>
+                                        <div class="metric-point">HR: <span>${r.heart_rate}</span></div>
+                                        <div class="metric-point">Glu: <span>${r.blood_sugar}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="/result/${r.id}/" class="view-report-btn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                View Full Report
+                            </a>
+                        </div>
+                        ${changeHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+
+</html>

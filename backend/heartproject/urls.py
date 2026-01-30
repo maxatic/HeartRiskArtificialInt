@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/patients/add/', views.add_patient, name='add_patient'),
     path('api/patients/', views.get_doctor_patients, name='get_doctor_patients'),
     path('api/patients/<int:patient_id>/history/', views.get_specific_patient_history, name='get_specific_patient_history'),
+    path('doctor/patient/<int:patient_id>/', views.patient_history_dashboard, name='patient_history_dashboard'),
     
 ]

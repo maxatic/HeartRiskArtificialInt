@@ -663,7 +663,7 @@
         function renderPatients(patients) {
             const list = document.getElementById('patient-list');
             const emptyState = document.getElementById('empty-state');
-            const countElement = document.querySelector('.stat-valid'); 
+            const countElement = document.querySelector('.stat-valid');
 
             // Update Count
             if (countElement) countElement.textContent = patients.length;
@@ -694,9 +694,9 @@
                             <p>${p.email || 'No email'}</p>
                         </div>
                     </div>
-                    <button onclick="viewHistory(${p.id})" class="logout-btn" style="border:1px solid #e5e7eb; font-size:13px;">
+                    <a href="/doctor/patient/${p.id}/" class="logout-btn" style="border:1px solid #e5e7eb; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
                         Assessment History
-                    </button>
+                    </a>
                 `;
                 list.appendChild(item);
             });
@@ -711,7 +711,7 @@
 
             const formData = new FormData(e.target);
             // Only convert fields present in form (email only)
-            const data = Object.fromEntries(formData.entries()); 
+            const data = Object.fromEntries(formData.entries());
             const token = localStorage.getItem('accessToken');
 
             try {
@@ -824,7 +824,7 @@
             document.getElementById('historyModal').classList.remove('active');
         }
 
-            // Close on backdrop click for history modal
+        // Close on backdrop click for history modal
         document.getElementById('historyModal').addEventListener('click', (e) => {
             if (e.target.id === 'historyModal') closeHistoryModal();
         });
@@ -835,13 +835,13 @@
                 content.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">No assessments found for this patient.</p>';
                 return;
             }
-            
+
             let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
             records.forEach(r => {
                 const date = new Date(r.created_at).toLocaleDateString();
                 const score = r.result ? r.result.toFixed(1) + '%' : 'N/A';
                 const color = (r.result && r.result > 50) ? '#ef4444' : '#10b981';
-                
+
                 html += `
                     <div style="padding:16px; border:1px solid #f0f0f0; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
                         <div>

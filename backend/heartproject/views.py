@@ -237,3 +237,8 @@ def get_specific_patient_history(request, patient_id):
     records = MedicalRecord.objects.filter(user=target_user).order_by('-created_at')
     serializer = MedicalRecordSerializer(records, many=True)
     return Response(serializer.data)
+
+def patient_history_dashboard(request, patient_id):
+    """Render the detailed patient history dashboard."""
+    # We pass the patient_id to the template so it can fetch data via JS
+    return render(request, 'doctor dashboard 2.html', {'patient_id': patient_id})
