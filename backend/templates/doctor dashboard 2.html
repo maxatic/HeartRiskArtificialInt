@@ -454,8 +454,9 @@
                 });
 
                 if (response.ok) {
-                    const records = await response.json();
-                    renderDashboard(records);
+                    const data = await response.json();
+                    // API returns { patient: {...}, history: [...] }
+                    renderDashboard(data.patient, data.history);
                 } else {
                     document.getElementById('patient-header-section').innerHTML = `<p style="color:red">Error loading patient data.</p>`;
                 }
@@ -464,69 +465,72 @@
             }
         }
 
-        function renderDashboard(records) {
-            if (!records || records.length === 0) {
-                document.getElementById('patient-header-section').innerHTML = `<p>No records found for this patient.</p>`;
+        function renderDashboard(patient, history) {
+            if (!history || history.length === 0) {
+                // Even if no history, we might still want to show patient header if patient data exists
+                if (patient) {
+                    renderPatientHeader(patient, null);
+                    document.getElementById('assessment-list-container').innerHTML = '<p>No assessment history found.</p>';
+                } else {
+                    document.getElementById('patient-header-section').innerHTML = `<p>No records found for this patient.</p>`;
+                }
                 return;
             }
 
-            // Assume patient info is same across records, take from first one or separate API
-            // Actually the API returns List[MedicalRecord]. Each record has user details inside 'user' field usually, 
-            // but MedicalRecordSerializer might just render user ID. 
-            // Let's check MedicalRecordSerializer. If it doesn't give patient details, we might need a separate call.
-            // Based on views.py: `serializer = MedicalRecordSerializer(records, many=True)`
-            // We'll proceed assuming we can get some info, or at least render the charts.
-            // Ideally we should fetch patient details separately if not in record.
+            const latest = history[0]; // history is ordered by -created_at
 
-            // For now, let's try to extract from the first record if available, 
-            // or we might need another API endpoint "get_patient_details" which strictly returns Patient model info.
-            // The `get_specific_patient_history` returns serialized MedicalRecords.
-
-            // Let's infer what we can.
-
-            const latest = records[0];
-            // records is ordered by -created_at, so 0 is latest.
-
-            renderPatientHeader(latest, records);
-            renderCharts(records);
-            renderHistoryList(records);
+            // Render header with patient data + latest risk score
+            renderPatientHeader(patient, latest);
+            renderCharts(history);
+            renderHistoryList(history);
         }
 
-        function renderPatientHeader(latestRecord, allRecords) {
-            // Note: In real app, we'd want a dedicated endpoint for patient profile.
-            // Using placeholder data mixed with real record data for now.
-            // If MedicalRecordSerializer includes user details, great. Otherwise we might show limited info.
+        function renderPatientHeader(patient, latestRecord) {
+            // Use patient data from API
+            const firstName = patient.first_name || '';
+            const lastName = patient.last_name || '';
+            const fullName = `${firstName} ${lastName}`.trim() || patient.email || 'Unknown Patient';
+            const email = patient.email || '';
 
-            const riskScore = latestRecord.result;
+            const riskScore = latestRecord ? latestRecord.result : 0;
             const isHighRisk = riskScore > 50;
             const riskLabel = isHighRisk ? 'High Risk' : 'Low Risk';
             const riskClass = isHighRisk ? 'high' : 'low';
-            const date = new Date(latestRecord.created_at).toLocaleDateString();
+            const date = latestRecord ? new Date(latestRecord.created_at).toLocaleDateString() : 'N/A';
+
+            // Avatar initials
+            const initials = firstName ? firstName[0].toUpperCase() + (lastName ? lastName[0].toUpperCase() : '') : 'PT';
 
             const html = `
                 <div class="patient-header-card">
                     <div class="patient-avatar">
-                        P${latestRecord.user || 'T'}
+                        ${initials}
                     </div>
                     <div class="patient-info-main">
                         <h1>
-                            Patient #${latestRecord.user} 
-                            <span class="risk-badge ${riskClass}">${riskLabel}</span>
+                            ${fullName} 
+                            ${latestRecord ? `<span class="risk-badge ${riskClass}">${riskLabel}</span>` : ''}
                         </h1>
                         <div class="patient-details-row">
                             <div class="detail-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                ${email}
+                            </div>
+                            <div class="detail-item">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                                ${latestRecord.age} years old
+                                ${patient.age || (latestRecord ? latestRecord.age : 'N/A')} years old
                             </div>
                             <div class="detail-item">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                 Added Recent
                             </div>
                         </div>
+                        ${latestRecord ? `
                         <div class="last-assessment-info">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             Last assessment: ${date} - Risk Score: ${Math.round(riskScore)}/100
                         </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
@@ -541,7 +545,6 @@
 
             // Metrics
             const systolicData = sorted.map(r => r.systolic_bp);
-            const cholesterolData = sorted.map(r => r.cholesterol); // Checking if serializer has this
             const heartRateData = sorted.map(r => r.heart_rate);
 
             // 1. Risk Trend Chart
@@ -614,8 +617,6 @@
                             pointBackgroundColor: '#10b981'
                         }
                     ]
-                    // Note: Cholesterol might be missing in serializer or model? 
-                    // If it exists in records, add it. If not, skip.
                 },
                 options: {
                     responsive: true,

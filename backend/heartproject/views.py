@@ -235,8 +235,13 @@ def get_specific_patient_history(request, patient_id):
     target_user = patient_record.user
     
     records = MedicalRecord.objects.filter(user=target_user).order_by('-created_at')
-    serializer = MedicalRecordSerializer(records, many=True)
-    return Response(serializer.data)
+    history_serializer = MedicalRecordSerializer(records, many=True)
+    patient_serializer = PatientSerializer(patient_record)
+    
+    return Response({
+        "patient": patient_serializer.data,
+        "history": history_serializer.data
+    })
 
 def patient_history_dashboard(request, patient_id):
     """Render the detailed patient history dashboard."""
