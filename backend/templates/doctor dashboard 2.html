@@ -370,6 +370,155 @@
                 justify-content: center;
             }
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1000px;
+            /* Removed fixed height and default overflow to fit content naturally */
+            /* If screen is too small, browser scroll will handle it, but for 1000px wide screens it should fit. */
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            margin: 16px;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f3f4f6;
+            color: #1a1a1a;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .report-section {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .report-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .report-item {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .report-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .report-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .risk-score-large {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .risk-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            border: 8px solid;
+        }
+
+        button.view-report-btn {
+            font-family: inherit;
+        }
     </style>
 </head>
 
@@ -436,9 +585,28 @@
         </main>
     </div>
 
+    <!-- Full Report Modal -->
+    <div id="reportModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Assessment Report</h2>
+                <button class="close-btn" onclick="closeReportModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
         const PATIENT_ID = {{ patient_id }};
         let charts = {};
+        let currentHistoryData = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchPatientHistory();
@@ -466,6 +634,7 @@
         }
 
         function renderDashboard(patient, history) {
+            currentHistoryData = history || [];
             if (!history || history.length === 0) {
                 // Even if no history, we might still want to show patient header if patient data exists
                 if (patient) {
@@ -712,16 +881,111 @@
                                 </div>
                             </div>
 
-                            <a href="/result/${r.id}/" class="view-report-btn">
+                            <button onclick="openReportModal(${index})" class="view-report-btn">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                 View Full Report
-                            </a>
+                            </button>
                         </div>
                         ${changeHtml}
                     </div>
                 `;
             }).join('');
         }
+
+        function openReportModal(index) {
+            const record = currentHistoryData[index];
+            if (!record) return;
+
+            const modal = document.getElementById('reportModal');
+            const body = document.getElementById('modalBody');
+
+            const d = new Date(record.created_at);
+            const _day = String(d.getDate()).padStart(2, '0');
+            const _month = String(d.getMonth() + 1).padStart(2, '0');
+            const _year = d.getFullYear();
+            const date = `${_day}.${_month}.${_year}`;
+
+            const score = Math.round(record.result);
+            const isHigh = score > 50;
+            const riskColor = isHigh ? '#ef4444' : '#16a34a';
+            const riskBg = isHigh ? '#fee2e2' : '#f0fdf4';
+
+            body.innerHTML = `
+                <div style="display: flex; gap: 32px; align-items: stretch;">
+                    <div class="report-section" style="flex: 0 0 320px;">
+
+                        <div class="risk-score-large" style="height: 100%; margin-bottom: 0;">
+                            <div class="risk-circle" style="border-color: ${riskColor}; background: ${riskBg}">
+                                <span style="font-size: 32px; font-weight: 700; color: ${riskColor}">${score}</span>
+                                <span style="font-size: 12px; font-weight: 600; color: ${riskColor}">Risk Score</span>
+                            </div>
+                            <div style="font-weight: 600; font-size: 18px; margin-bottom: 4px;">
+                                ${isHigh ? 'High Risk Detected' : 'Low Risk'}
+                            </div>
+                            <div style="color: #666; font-size: 14px;">
+                                Assessment Date: ${date}
+                            </div>
+                            <div style="color: #666; font-size: 14px; margin-top: 4px;">
+                                Age at Assessment: <strong>${record.age || 'N/A'}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-section" style="flex: 1;">
+                        <div class="report-section-title">Metrics</div>
+                        <div class="report-grid">
+                            <div class="report-item">
+                                <div class="report-label">Systolic BP</div>
+                                <div class="report-value">${record.systolic_bp || 'N/A'} <span style="font-size:12px; font-weight:400; color:#666">mmHg</span></div>
+                            </div>
+                            <div class="report-item">
+                                <div class="report-label">Diastolic BP</div>
+                                <div class="report-value">${record.diastolic_bp || 'N/A'} <span style="font-size:12px; font-weight:400; color:#666">mmHg</span></div>
+                            </div>
+                            <div class="report-item">
+                                <div class="report-label">Heart Rate</div>
+                                <div class="report-value">${record.heart_rate || 'N/A'} <span style="font-size:12px; font-weight:400; color:#666">BPM</span></div>
+                            </div>
+                            <div class="report-item">
+                                <div class="report-label">Blood Sugar</div>
+                                <div class="report-value">${record.blood_sugar || 'N/A'} <span style="font-size:12px; font-weight:400; color:#666">mg/dL</span></div>
+                            </div>
+
+                            <div class="report-item">
+                                <div class="report-label">CK-MB</div>
+                                <div class="report-value">${record.ck_mb || 'N/A'} <span style="font-size:12px; font-weight:400; color:#666">ng/mL</span></div>
+                            </div>
+                            <div class="report-item">
+                                <div class="report-label">Troponin</div>
+                                <div class="report-value">${record.troponin || 'N/A'} <span style="font-size:12px; font-weight:400; color:#666">ng/mL</span></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close on outside click
+        document.getElementById('reportModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('reportModal')) {
+                closeReportModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeReportModal();
+        });
     </script>
 </body>
 
