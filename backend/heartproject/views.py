@@ -88,7 +88,7 @@ def predict_heart_risk(request):
                 "shap_values": shap_values, 
                 "record_id": record.id
             })
-            
+        
         except Exception as e:
             return Response({"error": str(e)}, status=400)
     
