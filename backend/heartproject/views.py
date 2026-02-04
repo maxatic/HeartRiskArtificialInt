@@ -19,10 +19,17 @@ def my_health_summary(request):
 def get_profile(request):
     user = request.user
     full_name = user.get_full_name().strip()
+    
+    # Determine role
+    # If this user has added patients, they are a doctor
+    is_doctor = Patient.objects.filter(doctor=user).exists()
+    role = 'doctor' if is_doctor else 'patient'
+
     return Response({
         "full_name": full_name,
         "username": user.username,
         "email": user.email,
+        "role": role
     })
 
 from predictor.serializers import MedicalRecordSerializer
@@ -33,6 +40,17 @@ from .ml_model import predict_risk
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def predict_heart_risk(request):
+    # Determine target user
+    target_user = request.user
+    patient_id = request.data.get('patient_id')
+    
+    if patient_id:
+        try:
+            patient = Patient.objects.get(id=patient_id, doctor=request.user)
+            target_user = patient.user
+        except Patient.DoesNotExist:
+            return Response({"error": "Invalid patient ID or permission denied"}, status=403)
+            
     serializer = MedicalRecordSerializer(data=request.data)
     if serializer.is_valid():
         try:
@@ -60,8 +78,8 @@ def predict_heart_risk(request):
                 'Systolic blood pressure': data['systolic_bp'],
                 'Diastolic blood pressure': data['diastolic_bp'],
                 'Blood sugar': data['blood_sugar'],
-                'CK-MB': data['ck_mb'],
-                'Troponin': data['troponin']
+                'CK-MB': data.get('ck_mb', 0) or 0,
+                'Troponin': data.get('troponin', 0) or 0
             }
             
             # Helper to handle gender if it's a string, otherwise pass through
@@ -73,11 +91,21 @@ def predict_heart_risk(request):
             
             
             # 2. Get Prediction and Explanations
-            risk_percentage, shap_values = predict_risk(model_input)
+            
+            # Check if we should use the reduced model
+            # Logic: If CK-MB and Troponin are effectively 0 (not provided), use 6-feature model
+            use_reduced = False
+            ck_mb_val = data.get('ck_mb', 0)
+            trop_val = data.get('troponin', 0)
+            
+            if (ck_mb_val == 0 or ck_mb_val is None) and (trop_val == 0 or trop_val is None):
+                use_reduced = True
+                
+            risk_percentage, shap_values = predict_risk(model_input, use_reduced_model=use_reduced)
             
             # 3. Save to DB
             record = serializer.save(
-                user=request.user, 
+                user=target_user, 
                 result=risk_percentage,
                 shap_values=shap_values
             )
@@ -86,7 +114,8 @@ def predict_heart_risk(request):
                 "status": "success",
                 "risk_percentage": risk_percentage,
                 "shap_values": shap_values, 
-                "record_id": record.id
+                "record_id": record.id,
+                "is_partial_assessment": use_reduced
             })
         
         except Exception as e:
@@ -110,22 +139,53 @@ def get_assessment_detail(request, record_id):
     """
     API endpoint to fetch a specific assessment details and history.
     """
-    record = get_object_or_404(MedicalRecord, id=record_id, user=request.user)
+    record = get_object_or_404(MedicalRecord, id=record_id)
+    
+    # Check permissions: User owns record OR User is doctor of the record owner
+    has_permission = False
+    if record.user == request.user:
+        has_permission = True
+    elif Patient.objects.filter(doctor=request.user, user=record.user).exists():
+        has_permission = True
+        
+    if not has_permission:
+        return Response({"error": "Permission denied"}, status=403)
+
+    # Fetch history for chart (all records for this user)
+    history = MedicalRecord.objects.filter(user=record.user).order_by('created_at')
+    
+    # Serialize
     serializer = MedicalRecordSerializer(record)
     
-    # Get history for trend chart
-    history_qs = MedicalRecord.objects.filter(user=request.user).order_by('created_at')
+    # Simple history data for chart
     history_data = []
-    for h in history_qs:
+    for h in history:
         history_data.append({
             'id': h.id,
-            'date': h.created_at.strftime('%d/%m'),
+            'date': h.created_at.strftime("%Y-%m-%d"),
             'score': h.result
         })
         
+    # Determine viewer role and patient name
+    viewer_role = 'patient'
+    patient_name = record.user.get_full_name() or record.user.email
+    
+    if record.user != request.user:
+        # If the viewer is not the owner, they must be the doctor (checked above)
+        viewer_role = 'doctor'
+
+    # Determine if this was a partial assessment
+    # Check if CK-MB and Troponin are 0
+    is_partial = False
+    if record.ck_mb == 0 and record.troponin == 0:
+        is_partial = True
+
     return Response({
         "record": serializer.data,
-        "history": history_data
+        "history": history_data,
+        "viewer_role": viewer_role,
+        "patient_name": patient_name.strip(),
+        "is_partial_assessment": is_partial
     })
 
 
@@ -154,21 +214,77 @@ def auth(request):
             messages.error(request, 'User with this email already exists.')
             return render(request, 'auth.html')
 
-        # Create user (using email as username)
+        # Create user
         try:
-            user = User.objects.create_user(username=email, email=email, password=password) #Django's default User model requires a username. It's a mandatory field in the database.
+            user = User.objects.create_user(username=email, email=email, password=password)
             if full_name:
                 name_parts = full_name.split()
                 user.first_name = name_parts[0]
                 if len(name_parts) > 1:
                     user.last_name = " ".join(name_parts[1:])
             user.save()
+            
+            # Assign Role Group
+            role = request.POST.get('role')
+            print(f"DEBUG SIGNUP: Received role '{role}'")
+            if role in ['doctor', 'patient']:
+                from django.contrib.auth.models import Group
+                group, created = Group.objects.get_or_create(name=role.capitalize()) # 'Doctor' or 'Patient'
+                print(f"DEBUG SIGNUP: Group '{group.name}' (Created: {created})")
+                user.groups.add(group)
+                print(f"DEBUG SIGNUP: Added user {user.username} to group {group.name}")
+
             messages.success(request, 'Account created successfully! Please sign in.')
             return redirect('auth')
         except Exception as e:
+            print(f"DEBUG SIGNUP ERROR: {str(e)}")
             messages.error(request, f'Error creating account: {str(e)}')
             
     return render(request, 'auth.html')
+
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def api_login(request):
+    """
+    Custom login view to enforce role checks.
+    """
+    username = request.data.get('username')
+    password = request.data.get('password')
+    role = request.data.get('role') # 'doctor' or 'patient'
+    
+    print(f"DEBUG LOGIN: Attempting login for '{username}' as '{role}'")
+    
+    if not username or not password:
+         return Response({'error': 'Please provide both username and password'}, status=400)
+         
+    user = authenticate(username=username, password=password)
+    
+    if user is not None:
+        if role:
+            # Check if user belongs to the requested role group
+            # We assume group names are 'Doctor' and 'Patient'
+            group_name = role.capitalize()
+            user_groups = list(user.groups.values_list('name', flat=True))
+            print(f"DEBUG LOGIN: User groups: {user_groups}. Required: {group_name}")
+            
+            if not user.groups.filter(name=group_name).exists():
+                print(f"DEBUG LOGIN: Role mismatch!")
+                return Response({'error': f'Access denied: You are not registered as a {role}.'}, status=403)
+        
+        # Generate tokens
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        })
+    else:
+        return Response({'error': 'Invalid credentials'}, status=401)
+
 
 def dashboard(request):
     """Render the patient dashboard."""
@@ -220,8 +336,44 @@ def add_patient(request):
 def get_doctor_patients(request):
     """API to get list of patients for the logged-in doctor."""
     patients = Patient.objects.filter(doctor=request.user).order_by('-created_at')
-    serializer = PatientSerializer(patients, many=True)
-    return Response(serializer.data)
+    
+    # Calculate risk stats for each patient
+    patient_data = []
+    for patient in patients:
+        # Get patient serializer data
+        p_data = PatientSerializer(patient).data
+        
+        # Fetch last 5 records
+        records = MedicalRecord.objects.filter(user=patient.user).order_by('-created_at')[:5]
+        
+        if records.exists():
+            latest_score = records[0].result or 0
+            
+            # Calculate average of last 5
+            # Filter out None results just in case
+            valid_scores = [r.result for r in records if r.result is not None]
+            avg_score = sum(valid_scores) / len(valid_scores) if valid_scores else 0
+            
+            # Determine Risk Status
+            # Logic: High Risk if (Avg > 70) OR (Latest > 70)
+            if latest_score > 70 or avg_score > 70:
+                risk_status = 'High'
+            elif avg_score > 30:
+                risk_status = 'Moderate'
+            else:
+                risk_status = 'Low'
+                
+            p_data['risk_status'] = risk_status
+            p_data['latest_score'] = round(latest_score, 1)
+            p_data['average_score'] = round(avg_score, 1)
+        else:
+            p_data['risk_status'] = 'Unknown'
+            p_data['latest_score'] = 0
+            p_data['average_score'] = 0
+            
+        patient_data.append(p_data)
+        
+    return Response(patient_data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

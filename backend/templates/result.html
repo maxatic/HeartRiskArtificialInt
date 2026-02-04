@@ -423,6 +423,56 @@
             display: none;
             /* Hidden until loaded */
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-btn {
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -610,6 +660,26 @@
         </div>
     </div>
 
+    <!-- Partial Data Warning Modal -->
+    <div class="modal-overlay" id="partialDataModal">
+        <div class="modal-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="margin-bottom: 16px;">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                </path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <h3 style="font-size: 20px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">Accuracy Warning</h3>
+            <p style="color: #4b5563; margin-bottom: 24px;">
+                This result is not accurate as two important metrics (CK-MB and Troponin) were not entered.
+                Please take the full analysis test to improve accuracy.
+            </p>
+            <button class="modal-btn" onclick="closePartialModal()">I Understand</button>
+        </div>
+    </div>
+
     <script src="{% static 'js/api.js' %}"></script>
     <script>
         // The record ID is passed from the view
@@ -644,6 +714,7 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('contentArea').style.display = 'none';
                 document.getElementById('errorState').textContent = 'Unable to load results. Please try again.';
                 document.getElementById('errorState').style.display = 'block';
             }
@@ -652,10 +723,32 @@
         function renderPage(data) {
             const record = data.record;
             const history = data.history;
+            const isDoctor = data.viewer_role === 'doctor';
+            const patientName = data.patient_name || 'Patient';
+            const isPartial = data.is_partial_assessment;
+
+            // --- 0. Update Header ---
+            const pageHeader = document.querySelector('.page-header h1');
+            const pageSub = document.querySelector('.page-header p');
+
+            if (isDoctor) {
+                pageHeader.textContent = `${patientName}'s Risk Assessment Results`;
+                pageSub.textContent = `Based on health parameters provided for ${patientName}`;
+                // Also update window title
+                document.title = `${patientName}'s Results - CardioGuard Assistant`;
+            } else {
+                pageHeader.textContent = 'Your Risk Assessment Results';
+                pageSub.textContent = 'Based on the health parameters you provided';
+            }
 
             // Hide loading, show content
             document.getElementById('loading').style.display = 'none';
             document.getElementById('contentArea').style.display = 'block';
+
+            // Show Warning if Partial
+            if (isPartial) {
+                document.getElementById('partialDataModal').classList.add('active');
+            }
 
             // --- 1. Populate Metrics ---
             document.getElementById('m_age').textContent = record.age + ' years';
@@ -663,8 +756,8 @@
             document.getElementById('m_sbp').textContent = record.systolic_bp + ' mmHg';
             document.getElementById('m_dbp').textContent = record.diastolic_bp + ' mmHg';
             document.getElementById('m_bs').textContent = record.blood_sugar + ' mg/dL';
-            const ckmbValue = record.ck_mb === 0 ? '0' : (record.ck_mb || 'N/A');
-            const troponinValue = record.troponin === 0 ? '0' : (record.troponin || 'N/A');
+            const ckmbValue = record.ck_mb === 0 ? 'Not provided' : (record.ck_mb || 'N/A');
+            const troponinValue = record.troponin === 0 ? 'Not provided' : (record.troponin || 'N/A');
             document.getElementById('m_ckmb').textContent = ckmbValue;
             document.getElementById('m_trop').textContent = troponinValue;
 
@@ -712,7 +805,13 @@
             }, 100);
 
             // --- 3. SHAP Breakdown ---
-            renderRiskBreakdown(record);
+            try {
+                renderRiskBreakdown(record);
+            } catch (e) {
+                console.error("Failed to render risk breakdown:", e);
+                document.getElementById('riskFactorsEmpty').style.display = 'block';
+                document.getElementById('riskDistributionEmpty').style.display = 'block';
+            }
 
             // --- 4. Charts ---
             Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
@@ -782,15 +881,26 @@
                             }
                         }
                     },
-                    onLeave: (event, elements, chart) => {
-                        chart.canvas.style.cursor = 'default';
-                        if (historyHoverTimeout) {
-                            clearTimeout(historyHoverTimeout);
-                            historyHoverTimeout = null;
+                    onClick: (event, elements, chart) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const recordId = historyIds[index];
+                            if (recordId && String(recordId) !== String(RECORD_ID)) {
+                                window.location.href = `/result/${recordId}/`;
+                            }
                         }
                     }
                 }
             });
+
+            // --- 5. Risk Distribution Pie Chart ---
+            // If SHAP values exist, use them to create a distribution
+            // Wait, risk distribution was requested to be simpler or removed? 
+            // The original template had logic for it. Let's keep it simple.
+            // If no shap values, hide
+
+            // --- 5. Risk Distribution Pie Chart ---
+            // Logic handled inside renderRiskBreakdown now.
         }
 
         function renderRiskBreakdown(record) {
@@ -801,18 +911,15 @@
             const riskDistributionEmpty = document.getElementById('riskDistributionEmpty');
             const riskDistributionCard = document.getElementById('riskDistributionCard');
 
-            // 1. Define Average/Normal values
-            // 1. Define Average/Normal values
-            // UPDATED: 'val' is set to the MIDPOINT of [min, max] to ensure visual centering.
-            // This aligns the 'Average Dot' with the visual center of the 'Normal Brackets'.
+            // 1. Define Average/Normal values (Midpoints and Ranges)
             const averages = {
-                'Age': { val: 50, min: 20, max: 80 }, // Midpoint of 20-80
-                'Heart rate': { val: 80, min: 60, max: 100 }, // Midpoint of 60-100
-                'Systolic blood pressure': { val: 105, min: 90, max: 120 }, // Midpoint of 90-120
-                'Diastolic blood pressure': { val: 70, min: 60, max: 80 }, // Midpoint of 60-80
-                'Blood sugar': { val: 105, min: 70, max: 140 }, // Midpoint of 70-140
-                'CK-MB': { val: 2.5, min: 0, max: 5 }, // Midpoint of 0-5
-                'Troponin': { val: 0.02, min: 0, max: 0.04 } // Midpoint of 0-0.04
+                'Age': { val: 50, min: 20, max: 80 },
+                'Heart rate': { val: 80, min: 60, max: 100 },
+                'Systolic blood pressure': { val: 105, min: 90, max: 120 },
+                'Diastolic blood pressure': { val: 70, min: 60, max: 80 },
+                'Blood sugar': { val: 105, min: 70, max: 140 },
+                'CK-MB': { val: 2.5, min: 0, max: 5 },
+                'Troponin': { val: 0.02, min: 0, max: 0.04 }
             };
 
             const factorConfig = [
@@ -828,44 +935,39 @@
             const factors = factorConfig.map((factor) => {
                 const shap = Number(shapValues[factor.key]);
                 const safeShap = Number.isFinite(shap) ? shap : 0;
-
-                // --- NEW SCALING LOGIC ---
-                // Goal: The [min, max] interval should always visually be the middle 1/3 of the chart.
-                // This standardizes the "bracket size" across all metrics.
                 const avg = averages[factor.key];
                 let userVal = Number(factor.value) || 0;
 
-                let zoneLeft = 33.33; // Fixed start at 33%
-                let zoneWidth = 33.33; // Fixed width of 33%
-                let barLeft = 50; // default
+                let zoneLeft = 33.33;
+                let zoneWidth = 33.33;
+                let barLeft = 50;
                 let barWidth = 0;
-                let avgDotPos = 50; // default
+                let avgDotPos = 50;
                 let isNormal = true;
-                let barColor = '#334155'; // default
+                let barColor = '#334155';
 
                 if (avg) {
                     const normalSpan = avg.max - avg.min;
-                    // If normalSpan covers 33.33% of the chart, then the total chart span covers 3 * normalSpan.
-                    // The chart visual range is [avg.min - normalSpan, avg.max + normalSpan]
                     const chartMin = avg.min - normalSpan;
                     const chartMax = avg.max + normalSpan;
                     const chartSpan = chartMax - chartMin;
 
                     const getPercent = (val) => {
+                        if (chartSpan === 0) return 50;
                         let pct = ((val - chartMin) / chartSpan) * 100;
                         return Math.max(0, Math.min(100, pct));
                     };
 
                     const valPct = getPercent(userVal);
                     const avgPct = getPercent(avg.val);
-                    const minPct = getPercent(avg.min); // Should be approx 33.33
-                    const maxPct = getPercent(avg.max); // Should be approx 66.66
+                    const minPct = getPercent(avg.min);
+                    const maxPct = getPercent(avg.max);
 
                     zoneLeft = minPct;
                     zoneWidth = maxPct - minPct;
                     avgDotPos = avgPct;
 
-                    // Bar Geometry: From Average Dot to User Value
+                    // Bar Geometry
                     if (valPct < avgPct) {
                         barLeft = valPct;
                         barWidth = avgPct - valPct;
@@ -874,9 +976,8 @@
                         barWidth = valPct - avgPct;
                     }
 
-                    // Normal Check
                     isNormal = userVal >= avg.min && userVal <= avg.max;
-                    barColor = isNormal ? '#16a34a' : '#dc2626';
+                    barColor = isNormal ? '#16a34a' : '#dc2626'; // Green if normal, Red if not
                 }
 
                 return {
@@ -893,13 +994,12 @@
                 };
             });
 
-            // Normalize SHAP for total impact calculation (Pie Chart & Labels)
+            // Normalize SHAP for total impact calculation
             const totalAbsShap = factors.reduce((sum, item) => sum + item.abs, 0);
 
             riskFactorsList.innerHTML = '';
 
             if (totalAbsShap < 1e-6) {
-                // Empty state
                 riskFactorsEmpty.style.display = 'block';
                 riskDistributionEmpty.style.display = 'block';
                 return;
@@ -908,24 +1008,21 @@
             riskFactorsEmpty.style.display = 'none';
             riskDistributionEmpty.style.display = 'none';
 
-            // Sorting: Highest Impact First
+            // Sort by impact
             factors.sort((a, b) => b.abs - a.abs);
 
             factors.forEach((factor) => {
-                // Impact Logic
-                let finalLabel = "";
-                let badgeClass = "";
-                let badgeTextColor = "";
+                let finalLabel = factor.isNormal ? "Healthy Level" : "Negative Impact";
+                // Using "Negative Impact" for bad factors as requested previously
+                // Or maybe "Increase Risk" vs "Decrease Risk" based on SHAP sign?
+                // The previous code used "Healthy Level" vs "Risk Factor".
+                // I'll stick to Green = Positive Impact (Healthy), Red = Negative Impact (Risk) naming if possible,
+                // but the previous logic in `renderRiskBreakdown` (before I broke it) used `isNormal`.
 
-                if (factor.isNormal) {
-                    finalLabel = "Healthy Level";
-                    badgeClass = 'negative'; // Green style
-                    badgeTextColor = '#16a34a';
-                } else {
-                    finalLabel = "Risk Factor";
-                    badgeClass = ''; // Red style
-                    badgeTextColor = '#dc2626';
-                }
+                // Let's use the explicit logic:
+                let badgeClass = factor.isNormal ? 'risk-badge negative' : 'risk-badge'; // 'negative' class is Green in CSS
+                let badgeText = factor.isNormal ? 'Positive Impact' : 'Negative Impact';
+                let textColor = factor.isNormal ? '#16a34a' : '#dc2626';
 
                 const item = document.createElement('div');
                 item.className = 'risk-factor-item';
@@ -937,80 +1034,61 @@
                                 <span style="font-weight:600; color:#1e293b;">${factor.value} ${factor.unit}</span>
                             </div>
                         </div>
-                        <div class="risk-badge ${badgeClass}" style="display:flex; flex-direction:column; align-items:end; gap:2px; background:none; padding:0;">
-                            <span style="font-size:12px; font-weight:700; color:${badgeTextColor};">
-                                ${finalLabel}
+                        <div class="${badgeClass}" style="display:flex; flex-direction:column; align-items:end; gap:2px; background:none; padding:0;">
+                            <span style="font-size:12px; font-weight:700; color:${textColor};">
+                                ${badgeText}
                             </span>
                         </div>
                     </div>
                     
-                    <!-- Reference Scale -->
                     <div style="position: relative; height: 32px; margin-top: 8px;">
-                        
                         <!-- Axis Track -->
                         <div style="position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: #e2e8f0; transform: translateY(-50%);"></div>
 
-                        <!-- Safe Zone / Normal Interval -->
+                        <!-- Safe Zone -->
                         <div style="
                             position: absolute;
                             left: ${factor.zoneLeft}%;
                             width: ${factor.zoneWidth}%;
-                            top: 25%;
-                            bottom: 25%;
+                            top: 25%; bottom: 25%;
                             border-left: 2px solid #94a3b8;
                             border-right: 2px solid #94a3b8;
                             background: rgba(148, 163, 184, 0.1);
                             z-index: 0;
                         "></div>
+                        
                         <!-- Average dot -->
                         <div style="
-                            position: absolute; 
-                            left: ${factor.avgDotPos}%; 
-                            top: 50%; 
-                            width: 6px; 
-                            height: 6px; 
-                            border-radius: 50%; 
-                            background: #64748b; 
-                            transform: translate(-50%, -50%); 
-                            z-index: 1;
-                            box-shadow: 0 0 0 2px white;
+                            position: absolute; left: ${factor.avgDotPos}%; top: 50%; 
+                            width: 6px; height: 6px; border-radius: 50%; background: #64748b; 
+                            transform: translate(-50%, -50%); z-index: 1; box-shadow: 0 0 0 2px white;
                         "></div>
 
                         <!-- The Bar -->
                         <div style="
                             position: absolute; 
-                            left: ${factor.barLeft}%; 
-                            width: ${factor.barWidth}%; 
-                            top: 50%; 
-                            height: 6px; 
+                            left: ${factor.barLeft}%; width: ${factor.barWidth}%; 
+                            top: 50%; height: 6px; 
                             background: ${factor.barColor}; 
-                            transform: translateY(-50%);
-                            border-radius: 4px;
-                            transition: width 1s;
-                            z-index: 2;
+                            transform: translateY(-50%); border-radius: 4px; z-index: 2;
                         "></div>
                         
-                        <!-- Labels -->
                         <div style="position: absolute; left: 0; bottom: -12px; font-size: 10px; color: #94a3b8;">Low</div>
                         <div style="position: absolute; left: 50%; bottom: -12px; font-size: 10px; color: #64748b; transform: translateX(-50%); font-weight: 600;">Avg</div>
                         <div style="position: absolute; right: 0; bottom: -12px; font-size: 10px; color: #94a3b8;">High</div>
                     </div>
-                    <div style="margin-bottom: 24px;"></div>
                 `;
-
                 riskFactorsList.appendChild(item);
             });
 
-            // Pie Chart
-            if (riskDistributionChart) {
-                riskDistributionChart.destroy();
-            }
+            // Re-render Pie Chart
+            if (riskDistributionChart) riskDistributionChart.destroy();
 
             const pieLabels = factors.map(f => f.label);
-            const pieData = factors.map(f => f.abs); // Raw absolute shap values
+            const pieData = factors.map(f => f.abs);
 
             riskDistributionChart = new Chart(document.getElementById('riskDistributionChart'), {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: pieLabels,
                     datasets: [{
@@ -1025,26 +1103,15 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 10,
-                                padding: 16,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: (context) => {
-                                    const value = context.parsed || 0;
-                                    const percent = totalAbsShap ? (value / totalAbsShap) * 100 : 0;
-                                    return `${context.label}: ${percent.toFixed(1)}% Impact`;
-                                }
-                            }
-                        }
-                    }
+                        legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true } }
+                    },
+                    cutout: '60%'
                 }
             });
+        }
+
+        function closePartialModal() {
+            document.getElementById('partialDataModal').classList.remove('active');
         }
     </script>
 </body>

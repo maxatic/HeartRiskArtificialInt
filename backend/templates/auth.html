@@ -473,7 +473,8 @@
                     },
                     body: JSON.stringify({
                         username: data.username,
-                        password: data.password
+                        password: data.password,
+                        role: data.role // Send the selected role
                     })
                 });
 
@@ -495,7 +496,8 @@
                         window.location.href = "{% url 'dashboard' %}";
                     }
                 } else {
-                    alert('Login failed. Please check your credentials.');
+                    const result = await response.json();
+                    alert(result.error || 'Login failed. Please check your credentials.');
                     btn.textContent = originalText;
                     btn.disabled = false;
                 }

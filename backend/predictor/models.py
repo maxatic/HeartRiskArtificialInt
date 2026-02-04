@@ -11,8 +11,8 @@ class MedicalRecord(models.Model):
     systolic_bp = models.IntegerField(verbose_name="Systolic blood pressure")
     diastolic_bp = models.IntegerField(verbose_name="Diastolic blood pressure")
     blood_sugar = models.FloatField()
-    ck_mb = models.FloatField(verbose_name="CK-MB")
-    troponin = models.FloatField()
+    ck_mb = models.FloatField(verbose_name="CK-MB", blank=True, null=True)
+    troponin = models.FloatField(blank=True, null=True)
 
     # Store the prediction result (risk percentage)
     result = models.FloatField(blank=True, null=True, help_text="Risk percentage (0-100)")

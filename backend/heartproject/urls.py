@@ -13,7 +13,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('auth/', views.auth, name='auth'),
     # endpoint, where 'Login' - returns Access and Refresh tokens
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/login/', views.api_login, name='api_login'),
     # endpoint, where 'Renewer' - send refresh token here to get new access token
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/me/', views.get_profile, name='get_profile'),

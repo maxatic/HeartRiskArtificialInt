@@ -394,6 +394,13 @@
                 troponin: formData.get('troponin') || 0 // Default to 0 if empty
             };
 
+            // Check if we are doing this for a patient (Doctor Mode)
+            const urlParams = new URLSearchParams(window.location.search);
+            const patientId = urlParams.get('patient_id');
+            if (patientId) {
+                data.patient_id = patientId;
+            }
+
             try {
                 // Use authenticatedFetch handling auto-refresh
                 const response = await authenticatedFetch('/api/predict-risk/', {

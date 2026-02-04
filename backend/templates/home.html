@@ -1280,20 +1280,40 @@
         // BACKGROUND TOKEN MANAGEMENT
         const REFRESH_INTERVAL = 14 * 60 * 1000; // 14 minutes (tokens last 15 mins)
 
-        function checkLoginState() {
+        async function checkLoginState() {
             const accessToken = localStorage.getItem('accessToken');
             const refreshToken = localStorage.getItem('refreshToken');
 
             if (accessToken && refreshToken) {
-                updateNavForLoggedInUser();
-                scheduleTokenRefresh();
+                // Fetch user profile to get role
+                try {
+                    const response = await fetch('/api/me/', {
+                        headers: { 'Authorization': `Bearer ${accessToken}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateNavForLoggedInUser(data.role);
+                        scheduleTokenRefresh();
+                    } else {
+                        // Token might be invalid
+                        logout();
+                    }
+                } catch (e) {
+                    console.error("Error fetching profile:", e);
+                }
             }
         }
 
-        function updateNavForLoggedInUser() {
+        function updateNavForLoggedInUser(role) {
             const navButtons = document.querySelector('.nav-buttons');
+            let dashboardUrl = "{% url 'dashboard' %}"; // Default patient dashboard
+
+            if (role === 'doctor') {
+                dashboardUrl = "{% url 'doctor_dashboard' %}";
+            }
+
             navButtons.innerHTML = `
-                <a href="{% url 'dashboard' %}" class="btn btn-primary">Dashboard</a>
+                <a href="${dashboardUrl}" class="btn btn-primary">Dashboard</a>
                 <button onclick="logout()" class="btn btn-secondary" style="border: 1px solid #e0e0e0; background: transparent;">Logout</button>
             `;
         }

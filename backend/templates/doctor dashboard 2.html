@@ -543,7 +543,8 @@
                 </div>
             </div>
 
-            <a href="{% url 'predict_page' %}" class="start-assessment-btn">Start New Assessment</a>
+            <a href="{% url 'predict_page' %}?patient_id={{ patient_id }}" class="start-assessment-btn">Start New
+                Assessment</a>
         </nav>
 
         <main class="dashboard-content">
@@ -604,7 +605,7 @@
     </div>
 
     <script>
-        const PATIENT_ID = {{ patient_id }};
+        const PATIENT_ID = "{{ patient_id }}";
         let charts = {};
         let currentHistoryData = [];
 
