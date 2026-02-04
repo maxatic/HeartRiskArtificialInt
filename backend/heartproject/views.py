@@ -27,6 +27,8 @@ def get_profile(request):
 
     return Response({
         "full_name": full_name,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "username": user.username,
         "email": user.email,
         "role": role
