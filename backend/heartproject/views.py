@@ -182,12 +182,28 @@ def get_assessment_detail(request, record_id):
     if record.ck_mb == 0 and record.troponin == 0:
         is_partial = True
 
+    # Get Patient ID if doctor
+    patient_id = None
+    if viewer_role == 'doctor':
+        try:
+            p = Patient.objects.get(user=record.user, doctor=request.user)
+            patient_id = p.id
+        except Patient.DoesNotExist:
+            pass
+
+    # Check if the current user is a doctor (generic check)
+    is_doctor_user = False
+    if request.user.groups.filter(name='Doctor').exists() or Patient.objects.filter(doctor=request.user).exists():
+        is_doctor_user = True
+
     return Response({
         "record": serializer.data,
         "history": history_data,
         "viewer_role": viewer_role,
         "patient_name": patient_name.strip(),
-        "is_partial_assessment": is_partial
+        "is_partial_assessment": is_partial,
+        "patient_id": patient_id,
+        "is_doctor_user": is_doctor_user
     })
 
 
