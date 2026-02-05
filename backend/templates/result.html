@@ -904,7 +904,13 @@
                 { key: 'Blood sugar', label: 'Blood Sugar', unit: 'mg/dL', value: record.blood_sugar },
                 { key: 'CK-MB', label: 'CK-MB', unit: '', value: record.ck_mb },
                 { key: 'Troponin', label: 'Troponin', unit: '', value: record.troponin }
-            ];
+            ].filter(f => {
+                // Remove CK-MB and Troponin if 0 (not provided)
+                if ((f.key === 'CK-MB' || f.key === 'Troponin') && (f.value == 0 || f.value == null)) {
+                    return false;
+                }
+                return true;
+            });
 
             const factors = factorConfig.map((factor) => {
                 const shap = Number(shapValues[factor.key]);

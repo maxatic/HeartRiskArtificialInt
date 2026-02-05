@@ -789,7 +789,9 @@
                     const data = await response.json();
                     const nameElement = document.getElementById('user-name');
 
-                    if (data.first_name && data.last_name) {
+                    if (data.full_name && data.full_name.trim() !== "") {
+                        nameElement.textContent = `Dr. ${data.full_name}`;
+                    } else if (data.first_name && data.last_name) {
                         nameElement.textContent = `Dr. ${data.first_name} ${data.last_name}`;
                     } else if (data.email) {
                         // Fallback to email if name is not set

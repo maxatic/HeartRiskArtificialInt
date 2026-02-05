@@ -251,6 +251,37 @@ def auth(request):
                 print(f"DEBUG SIGNUP: Group '{group.name}' (Created: {created})")
                 user.groups.add(group)
                 print(f"DEBUG SIGNUP: Added user {user.username} to group {group.name}")
+                
+                # Check for Doctor Email if role is Patient
+                if role == 'patient':
+                    doctor_email = request.POST.get('doctor_email', '').strip()
+                    if doctor_email:
+                        print(f"DEBUG SIGNUP: Attempting to link to doctor with email '{doctor_email}'")
+                        try:
+                            doctor_user = User.objects.get(email=doctor_email)
+                            # Verify this user is actually a doctor (optional but good practice)
+                            if doctor_user.groups.filter(name='Doctor').exists() or Patient.objects.filter(doctor=doctor_user).exists():
+                                from predictor.models import Patient
+                                Patient.objects.create(
+                                    doctor=doctor_user,
+                                    user=user
+                                )
+                                print(f"DEBUG SIGNUP: Successfully linked patient to doctor {doctor_email}")
+                            else:
+                                print(f"DEBUG SIGNUP: User {doctor_email} is found but may not be a doctor.")
+                                # We'll just log this for now, maybe still link? Let's strictly check group or existence of their own patients?
+                                # Actually, a new doctor might not have patients yet. Checking group is safest if we assign groups correctly.
+                                # Let's assume group check is good.
+                                pass 
+                        except User.DoesNotExist:
+                            # If doctor email provided but not found, we should probably fail or warn.
+                            # User requested: "If the entered email is not found, the signup will be blocked with an error message"
+                            # So we need to rollback the user creation? Or check this BEFORE creating the user.
+                            # Let's move this check UP before checking user creation if possible, OR delete user and error.
+                            print(f"DEBUG SIGNUP: Doctor with email {doctor_email} not found.")
+                            user.delete() # Rollback
+                            messages.error(request, f'Doctor with email "{doctor_email}" not found. Please check the email or leave blank.')
+                            return render(request, 'auth.html')
 
             messages.success(request, 'Account created successfully! Please sign in.')
             return redirect('auth')
