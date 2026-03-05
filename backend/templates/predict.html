@@ -390,8 +390,8 @@
                 systolic_bp: formData.get('systolic_bp'),
                 diastolic_bp: formData.get('diastolic_bp'),
                 blood_sugar: formData.get('blood_sugar'),
-                ck_mb: formData.get('ck_mb') || 0, // Default to 0 if empty
-                troponin: formData.get('troponin') || 0 // Default to 0 if empty
+                ck_mb: formData.get('ck_mb'), // Send empty string if blank
+                troponin: formData.get('troponin') // Send empty string if blank
             };
 
             // Check if we are doing this for a patient (Doctor Mode)
