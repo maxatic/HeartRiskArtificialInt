@@ -329,11 +329,9 @@ def add_patient(request):
          return Response({"error": "Patient already added"}, status=400)
 
     # Create link
-    # We can optionally accept age/patient_id if sent, but mainly just email is used now.
     patient = Patient.objects.create(
         doctor=request.user,
         user=user,
-        patient_id=request.data.get('patient_id'),
         age=request.data.get('age')
     )
     
