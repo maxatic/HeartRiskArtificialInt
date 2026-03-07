@@ -369,6 +369,7 @@ It followed the design and recreated it here
     </div>
 
     <script src="{% static 'js/api.js' %}"></script>
+    <!--Was written with help of Antigravity with Gemini 3.1 Pro-->
     <script>
         // Check authentication on load
         document.addEventListener('DOMContentLoaded', () => {
@@ -422,10 +423,7 @@ It followed the design and recreated it here
                 }
 
                 const result = await response.json();
-                console.log("Prediction Result:", result); // Debugging
-
                 if (response.ok) {
-                    console.log("Redirecting to:", `/result/${result.record_id}/`);
                     // Redirect to the new detailed result page
                     window.location.href = `/result/${result.record_id}/`;
                 } else {
