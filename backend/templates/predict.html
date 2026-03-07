@@ -1,3 +1,8 @@
+<!--
+For making this part we used our ptototype page from Figma
+We put the design to Antigrvity with Gemini 3.1 Pro
+It followed the design and recreated it here
+-->
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
@@ -364,6 +369,7 @@
     </div>
 
     <script src="{% static 'js/api.js' %}"></script>
+    <!--Was written with help of Antigravity with Gemini 3.1 Pro-->
     <script>
         // Check authentication on load
         document.addEventListener('DOMContentLoaded', () => {
@@ -390,8 +396,8 @@
                 systolic_bp: formData.get('systolic_bp'),
                 diastolic_bp: formData.get('diastolic_bp'),
                 blood_sugar: formData.get('blood_sugar'),
-                ck_mb: formData.get('ck_mb') || 0, // Default to 0 if empty
-                troponin: formData.get('troponin') || 0 // Default to 0 if empty
+                ck_mb: formData.get('ck_mb'), // Send empty string if blank
+                troponin: formData.get('troponin') // Send empty string if blank
             };
 
             // Check if we are doing this for a patient (Doctor Mode)
@@ -417,10 +423,7 @@
                 }
 
                 const result = await response.json();
-                console.log("Prediction Result:", result); // Debugging
-
                 if (response.ok) {
-                    console.log("Redirecting to:", `/result/${result.record_id}/`);
                     // Redirect to the new detailed result page
                     window.location.href = `/result/${result.record_id}/`;
                 } else {

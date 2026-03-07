@@ -1,5 +1,13 @@
+<!--
+For making this part we used our ptototype page from Figma
+We put the design to Antigrvity with Gemini 3.1 Pro
+It followed the design and recreated it here
+-->
 <!DOCTYPE html>
 <html lang="en">
+<!--
+Header of the page
+-->
 
 <head>
     <meta charset="UTF-8">
@@ -252,11 +260,16 @@
         }
     </style>
 </head>
+<!--
+ Body of the page with the container for the auth card
+ It also has a possibility to switch between sign in and sign up
+ And different roles for users: patient and doctor
+ -->
 
 <body>
     <div class="auth-container">
         <div class="auth-card">
-            <!-- Tab Toggle -->
+            <!-- Tab Change -->
             <div class="tab-toggle" id="tab-toggle-container">
                 <button class="tab-btn active" id="signin-tab" onclick="switchTab('signin')">Sign In</button>
                 <button class="tab-btn" id="signup-tab" onclick="switchTab('signup')">Sign Up</button>
@@ -305,6 +318,8 @@
 
             <!-- Sign In Form -->
             <form id="signin-form" style="display: none;" onsubmit="handleLogin(event)">
+                <!-- That {% csrf_token %} tag is a mandatory security feature built right into Django
+                 We must include it in every form to prevent CSRF attacks-->
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="signin">
                 <input type="hidden" name="role" id="signin-role">
@@ -320,7 +335,6 @@
                 <div class="form-group">
                     <label>Email</label>
                     <input type="text" name="username" placeholder="Enter your username" required>
-                    <!-- Changed to text/username as SimpleJWT uses username by default usually, but we'll check views -->
                 </div>
 
                 <div class="form-group">
@@ -331,7 +345,7 @@
                 <button type="submit" class="submit-btn" id="login-btn">Sign In</button>
             </form>
 
-            <!-- Sign Up Form (Unchanged for now, keeping standard submit) -->
+            <!-- Sign Up Form -->
             <form id="signup-form" style="display: none;" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="form_type" value="signup">
@@ -385,7 +399,7 @@
 
         const patientIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
         const doctorIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"/><path d="m9 11 4 4"/><path d="m5 19-3 3"/><path d="m14 4 6 6"/></svg>';
-
+        // This function is used to switch between the signin and signup tabs   
         function switchTab(tab) {
             currentTab = tab;
             selectedRole = null;
@@ -395,8 +409,8 @@
             document.getElementById('signup-tab').classList.toggle('active', tab === 'signup');
 
             // Update header
-            document.getElementById('auth-title').textContent = tab === 'signin' ? 'Welcome Back' : 'Create Account';
-            document.getElementById('auth-subtitle').textContent = tab === 'signin' ? 'Sign in to your account' : 'Join CardioGuard AI today';
+            document.getElementById('auth-title').textContent = tab === 'signin' ? 'Welcome Back' : 'Create Account'; // If the tab is signin, show Welcome Back, otherwise show Create Account
+            document.getElementById('auth-subtitle').textContent = tab === 'signin' ? 'Sign in to your account' : 'Join CardioGuard AI today'; // If the tab is signin, show Sign in to your account, otherwise show Join CardioGuard AI today
 
             // Show role selection, hide forms
             document.getElementById('role-selection').style.display = 'block';
@@ -407,7 +421,7 @@
             document.getElementById('patient-card').classList.remove('selected');
             document.getElementById('doctor-card').classList.remove('selected');
         }
-
+        // This function is used to select the role of the user
         function selectRole(role) {
             selectedRole = role;
 
@@ -431,7 +445,7 @@
             document.getElementById('signup-role-text').textContent = 'Signing up as ' + roleText;
 
             // Show/hide doctor ID field for patients only
-            document.getElementById('doctor-id-group').style.display = role === 'patient' ? 'block' : 'none';
+            document.getElementById('doctor-id-group').style.display = role === 'patient' ? 'block' : 'none'; // If the role is patient, show the doctor ID field, otherwise hide it    
 
             // Show appropriate form
             if (currentTab === 'signin') {
@@ -453,7 +467,8 @@
             document.getElementById('patient-card').classList.remove('selected');
             document.getElementById('doctor-card').classList.remove('selected');
         }
-
+        // This function is used to handle the login process
+        // It is written by Antigravity with Gemini 3.1 Pro
         async function handleLogin(event) {
             event.preventDefault();
             const btn = document.getElementById('login-btn');
