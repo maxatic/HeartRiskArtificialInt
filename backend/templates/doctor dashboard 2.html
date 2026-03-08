@@ -1,3 +1,8 @@
+<!--
+For making this part we used our ptototype page from Figma
+We put the design to Antigrvity with Gemini 3.1 Pro
+It followed the design and recreated it here
+-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -398,8 +403,6 @@
             border-radius: 16px;
             width: 100%;
             max-width: 1000px;
-            /* Removed fixed height and default overflow to fit content naturally */
-            /* If screen is too small, browser scroll will handle it, but for 1000px wide screens it should fit. */
             position: relative;
             transform: translateY(20px);
             transition: transform 0.3s ease;
@@ -548,13 +551,13 @@
         </nav>
 
         <main class="dashboard-content">
-            <!-- 1. Patient Info Header is dynamic -->
+            <!-- Patient Info Header is dynamic -->
             <div id="patient-header-section">
                 <!-- Loaded via JS -->
                 <p>Loading patient details...</p>
             </div>
 
-            <!-- 2. Risk Score Trend -->
+            <!-- Risk Score Trend -->
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">Risk Score Trend</h2>
@@ -564,7 +567,7 @@
                 </div>
             </div>
 
-            <!-- 3. Health Metrics Over Time -->
+            <!-- Health Metrics Over Time -->
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">Health Metrics Over Time</h2>
@@ -574,13 +577,12 @@
                 </div>
             </div>
 
-            <!-- 4. Assessment History List -->
+            <!-- Assessment History List -->
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title" id="history-title">Assessment History</h2>
                 </div>
                 <div id="assessment-list-container" class="assessment-list">
-                    <!-- Populated by JS -->
                 </div>
             </div>
         </main>
@@ -598,12 +600,10 @@
                     </svg>
                 </button>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Content populated by JS -->
-            </div>
+            <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
-
+    <!-- Fetch patient history and render the dashboard-->
     <script>
         const PATIENT_ID = "{{ patient_id }}";
         let charts = {};
@@ -627,21 +627,25 @@
                     // API returns { patient: {...}, history: [...] }
                     renderDashboard(data.patient, data.history);
                 } else {
+                    // If the response is not ok, we display an error message
+                    // Was suggested by Antigravity with Gemini 3.1 Pro
                     document.getElementById('patient-header-section').innerHTML = `<p style="color:red">Error loading patient data.</p>`;
                 }
             } catch (error) {
                 console.error("Error:", error);
             }
         }
-
+        // Render the dashboard with patient data and history
         function renderDashboard(patient, history) {
             currentHistoryData = history || [];
             if (!history || history.length === 0) {
                 // Even if no history, we might still want to show patient header if patient data exists
                 if (patient) {
+                    // Found patient but no history
                     renderPatientHeader(patient, null);
                     document.getElementById('assessment-list-container').innerHTML = '<p>No assessment history found.</p>';
                 } else {
+                    // No patient data found
                     document.getElementById('patient-header-section').innerHTML = `<p>No records found for this patient.</p>`;
                 }
                 return;
@@ -661,7 +665,7 @@
             const lastName = patient.last_name || '';
             const fullName = `${firstName} ${lastName}`.trim() || patient.email || 'Unknown Patient';
             const email = patient.email || '';
-
+            // Risk score and date from latest record
             const riskScore = latestRecord ? latestRecord.result : 0;
             const isHighRisk = riskScore > 50;
             const riskLabel = isHighRisk ? 'High Risk' : 'Low Risk';
@@ -706,7 +710,8 @@
             `;
             document.getElementById('patient-header-section').innerHTML = html;
         }
-
+        // Written by Antigravity with Gemini 3.1 Pro
+        // We needed to include the charts in the dashboard
         function renderCharts(records) {
             // Prepare Data (reverse because records are desc)
             const sorted = [...records].reverse();
@@ -718,7 +723,7 @@
             const diastolicData = sorted.map(r => r.diastolic_bp);
             const heartRateData = sorted.map(r => r.heart_rate);
 
-            // 1. Risk Trend Chart
+            // Risk Trend Chart
             const ctxRisk = document.getElementById('riskTrendChart').getContext('2d');
 
             // Gradient fill
@@ -763,7 +768,7 @@
                 }
             });
 
-            // 2. Health Metrics Chart
+            // Health Metrics Chart
             const ctxHealth = document.getElementById('healthMetricsChart').getContext('2d');
             if (charts.health) charts.health.destroy();
 
@@ -824,6 +829,7 @@
             });
         }
 
+        // It is a history list of assessments
         function renderHistoryList(records) {
             const container = document.getElementById('assessment-list-container');
             document.getElementById('history-title').textContent = `Assessment History (${records.length})`;
@@ -843,9 +849,7 @@
                     const prevScore = records[index + 1].result;
                     const diff = score - prevScore;
                     const sign = diff > 0 ? '+' : '';
-                    const colorClass = diff > 0 ? 'negative' : (diff < 0 ? 'positive' : ''); // Higher score is bad
-                    // Wait, higher risk is bad. So +diff is negative health wise.
-
+                    const colorClass = diff > 0 ? 'negative' : (diff < 0 ? 'positive' : '');
                     if (diff !== 0) {
                         changeHtml = `
                             <div class="change-indicator">
@@ -892,7 +896,10 @@
                 `;
             }).join('');
         }
-
+        // Written by Antigravity with Gemini 3.1 Pro
+        // It is a function to open the report modal
+        // The pop-up window (modal) that appears when a doctor clicks the "View Full Report" button 
+        // on one of the patient's past assessments.
         function openReportModal(index) {
             const record = currentHistoryData[index];
             if (!record) return;

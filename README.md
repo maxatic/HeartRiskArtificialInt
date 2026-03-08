@@ -46,7 +46,9 @@ To run this project locally, ensure you have the following installed:
    ```
 
 4. **Run Database Migrations**
+   Return to the main project directory and run the migrations:
    ```bash
+   cd ..
    python manage.py migrate
    ```
 

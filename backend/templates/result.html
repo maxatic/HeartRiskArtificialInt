@@ -1,3 +1,8 @@
+<!--
+For making this part we used our ptototype page from Figma
+We put the design to Antigrvity with Gemini 3.1 Pro
+It followed the design and recreated it here
+-->
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
@@ -614,7 +619,8 @@
         </div>
     </div>
 
-    <!-- Partial Data Warning Modal -->
+    <!-- Partial Data Warning Modal 
+     We decided to include it, so the patient will be aware that the prediction is not accurate without all data-->
     <div class="modal-overlay" id="partialDataModal">
         <div class="modal-card">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
@@ -673,7 +679,13 @@
                 document.getElementById('errorState').style.display = 'block';
             }
         });
-
+        // It was witten with the help of Antogravity with Gemini 3.1 Pro
+        // This core function runs when the result data successfully loads from the backend.
+        // It takes all the patient's data (blood pressure, risk score, history) and injects it 
+        // into the HTML page to build the final visible dashboard. 
+        // Fills out the health metrics grid.  Colors the top banner (Green/Yellow/Red) based on the final risk percentage.
+        // Analyzes the AI SHAP values to explain WHICH factors drove the result.
+        // Draws a line chart showing the patient's historical risk trend over time.
         function renderPage(data) {
             const record = data.record;
             const history = data.history;
@@ -681,7 +693,7 @@
             const patientName = data.patient_name || 'Patient';
             const isPartial = data.is_partial_assessment;
 
-            // --- 0. Update Header ---
+            // Update Header ---
             const pageHeader = document.querySelector('.page-header h1');
             const pageSub = document.querySelector('.page-header p');
 
@@ -704,7 +716,7 @@
                 document.getElementById('partialDataModal').classList.add('active');
             }
 
-            // --- 1. Populate Metrics ---
+            // Populate Metrics ---
             document.getElementById('m_age').textContent = record.age + ' years';
             document.getElementById('m_hr').textContent = record.heart_rate + ' bpm';
             document.getElementById('m_sbp').textContent = record.systolic_bp + ' mmHg';
@@ -715,7 +727,7 @@
             document.getElementById('m_ckmb').textContent = ckmbValue;
             document.getElementById('m_trop').textContent = troponinValue;
 
-            // --- 2. Banner Logic ---
+            // Banner Logic ---
             const riskScore = parseFloat(record.result);
             const banner = document.getElementById('riskBanner');
             const rTitle = document.getElementById('riskTitle');
@@ -733,7 +745,7 @@
 
             let color = '#dc2626'; // High
             let bannerClass = 'high';
-
+            // Shows different nessage depending on the risk score
             if (riskScore < 30) {
                 color = '#059669';
                 bannerClass = 'low';
@@ -752,7 +764,7 @@
                 rIcon.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`;
             }
 
-            // --- 3. Update Back Button Logic ---
+            // Update Back Button Logic ---
             const backBtn = document.getElementById('backBtn');
             if (backBtn) {
                 // Priority 1: Doctor viewing specific patient -> Patient History
@@ -778,7 +790,13 @@
                 if (bannerClass === 'high') banner.style.borderColor = '#fee2e2'; // Reset override
             }, 100);
 
-            // --- 3. SHAP Breakdown ---
+            // The next code was withhen by Antigravity with Gemini 3.1 Pro. 
+            // SHAP Breakdown
+            // We put this in a "try/catch" block because building the complex Risk Factor 
+            // analysis and Pie Chart can be sensitive to missing or weird data.
+            // If anything crashes while it tries to build the charts, the "catch" block 
+            // takes over. Instead of the whole page breaking, it gracefully hides the broken 
+            // charts and shows a polite "Contribution details are not available" message.
             try {
                 renderRiskBreakdown(record);
             } catch (e) {
@@ -787,11 +805,11 @@
                 document.getElementById('riskDistributionEmpty').style.display = 'block';
             }
 
-            // --- 4. Charts ---
+            // Charts
             Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
             Chart.defaults.color = '#64748b';
 
-            // --- History Chart ---
+            // History Chart 
             // history array of {date: string, score: number}
             const historyDates = history.map(h => h.date);
             const historyScores = history.map(h => h.score);
@@ -867,14 +885,6 @@
                 }
             });
 
-            // --- 5. Risk Distribution Pie Chart ---
-            // If SHAP values exist, use them to create a distribution
-            // Wait, risk distribution was requested to be simpler or removed? 
-            // The original template had logic for it. Let's keep it simple.
-            // If no shap values, hide
-
-            // --- 5. Risk Distribution Pie Chart ---
-            // Logic handled inside renderRiskBreakdown now.
         }
 
         function renderRiskBreakdown(record) {
@@ -885,7 +895,10 @@
             const riskDistributionEmpty = document.getElementById('riskDistributionEmpty');
             const riskDistributionCard = document.getElementById('riskDistributionCard');
 
-            // 1. Define Average/Normal values (Midpoints and Ranges)
+            // Define Average/Normal values (Midpoints and Ranges)
+            // These hardcoded values were defined based on general medical guidelines 
+            // We use these as a visual baseline so the charts can draw the gray "Safe Zone" 
+            // box and the graph can accurately position the patient's data relative to "Normal."
             const averages = {
                 'Age': { val: 50, min: 20, max: 80 },
                 'Heart rate': { val: 80, min: 60, max: 100 },
@@ -911,13 +924,15 @@
                 }
                 return true;
             });
-
+            // It was written with help of Antigravity with Gemini 3.1 Pro
+            // For every single health factor (Age, Heart Rate, etc.), we figure out where to place the elements.
             const factors = factorConfig.map((factor) => {
                 const shap = Number(shapValues[factor.key]);
                 const safeShap = Number.isFinite(shap) ? shap : 0;
                 const avg = averages[factor.key];
                 let userVal = Number(factor.value) || 0;
 
+                // Default starting positions (dead center) in case something goes wrong
                 let zoneLeft = 33.33;
                 let zoneWidth = 33.33;
                 let barLeft = 50;
@@ -926,28 +941,33 @@
                 let isNormal = true;
                 let barColor = '#334155';
 
+                // If we found a medical baseline for this factor (defined in `const averages` above)
                 if (avg) {
+                    // Establish the "Scale" of the chart (e.g. from 0 to 200 Blood Pressure)
                     const normalSpan = avg.max - avg.min;
                     const chartMin = avg.min - normalSpan;
                     const chartMax = avg.max + normalSpan;
                     const chartSpan = chartMax - chartMin;
 
+                    // Helper function: turns a raw medical number into a CSS Percentage (0% to 100%)
                     const getPercent = (val) => {
                         if (chartSpan === 0) return 50;
                         let pct = ((val - chartMin) / chartSpan) * 100;
                         return Math.max(0, Math.min(100, pct));
                     };
 
-                    const valPct = getPercent(userVal);
-                    const avgPct = getPercent(avg.val);
-                    const minPct = getPercent(avg.min);
-                    const maxPct = getPercent(avg.max);
+                    const valPct = getPercent(userVal); // Where the patient is
+                    const avgPct = getPercent(avg.val); // Where the exact average is
+                    const minPct = getPercent(avg.min); // Start of Safe Zone
+                    const maxPct = getPercent(avg.max); // End of Safe Zone
 
+                    // Figure out how wide to draw the gray "Safe Zone" box
                     zoneLeft = minPct;
                     zoneWidth = maxPct - minPct;
                     avgDotPos = avgPct;
 
-                    // Bar Geometry
+                    // Figure out how wide to draw the actual Colored Bar (the patient's data)
+                    // It always starts at the "Average" dot and draws a line out to the patient's number.
                     if (valPct < avgPct) {
                         barLeft = valPct;
                         barWidth = avgPct - valPct;
@@ -956,10 +976,12 @@
                         barWidth = valPct - avgPct;
                     }
 
+                    // Paint it Green if they are inside the bounds, Red if they are outside
                     isNormal = userVal >= avg.min && userVal <= avg.max;
                     barColor = isNormal ? '#16a34a' : '#dc2626'; // Green if normal, Red if not
                 }
 
+                // Return all these calculated CSS values so the HTML can use them later
                 return {
                     ...factor,
                     shap: safeShap,
@@ -973,8 +995,9 @@
                     isNormal
                 };
             });
-
-            // Normalize SHAP for total impact calculation
+            // It was generated by Antigravity with Gemini 3.1 Pro to make it possible to show pie chart
+            // We sum up all the SHAP values first to see if the AI actually gave us any data.
+            // If the total is near 0, we can't draw the charts, so we return early and show the empty message.
             const totalAbsShap = factors.reduce((sum, item) => sum + item.abs, 0);
 
             riskFactorsList.innerHTML = '';
@@ -988,17 +1011,14 @@
             riskFactorsEmpty.style.display = 'none';
             riskDistributionEmpty.style.display = 'none';
 
-            // Sort by impact
+            // Sort by impact: We want the most influential factor (good or bad) at the top of the list
             factors.sort((a, b) => b.abs - a.abs);
 
+            // Loop through every factor we calculated the math for above, and dynamically write the 
+            // HTML code needed to draw it onto the screen. This injects all the ${factor.barWidth}% 
+            // variables into the actual CSS styles of the DOM.
             factors.forEach((factor) => {
                 let finalLabel = factor.isNormal ? "Healthy Level" : "Negative Impact";
-                // Using "Negative Impact" for bad factors as requested previously
-                // Or maybe "Increase Risk" vs "Decrease Risk" based on SHAP sign?
-                // The previous code used "Healthy Level" vs "Risk Factor".
-                // I'll stick to Green = Positive Impact (Healthy), Red = Negative Impact (Risk) naming if possible,
-                // but the previous logic in `renderRiskBreakdown` (before I broke it) used `isNormal`.
-
                 // Let's use the explicit logic:
                 let badgeClass = factor.isNormal ? 'risk-badge negative' : 'risk-badge'; // 'negative' class is Green in CSS
                 let badgeText = factor.isNormal ? 'Positive Impact' : 'Negative Impact';
@@ -1062,6 +1082,8 @@
             });
 
             // Re-render Pie Chart
+            // Finally, we take those same SHAP values and feed them into the Chart.js library to 
+            // draw the "Risk Distribution" pie chart.
             if (riskDistributionChart) riskDistributionChart.destroy();
 
             const pieLabels = factors.map(f => f.label);

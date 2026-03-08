@@ -1,6 +1,8 @@
 """
 Machine Learning model for heart disease risk prediction.
 Uses the Kaggle Medical Dataset to train a Random Forest classifier.
+Written with the help of Antigravity with Gemini 3.1 Pro
+We found that this model works better than others and implemented it in our project.
 """
 import pandas as pd
 import numpy as np
@@ -37,6 +39,7 @@ FEATURE_COLUMNS_REDUCED = [
 
 
 def load_and_prepare_data(feature_columns):
+
     df = pd.read_csv(DATA_PATH)
     
     # Features (X) and target (y)
@@ -75,15 +78,12 @@ def train_model(feature_columns=FEATURE_COLUMNS, model_path=MODEL_PATH, scaler_p
     
     print(f"Accuracy (Random Forest): {accuracy:.4f}")
     
+    # Written with the help of Antigravity with Gemini 3.1 Pro
     # Save model AND scaler
     joblib.dump(model, model_path)
     joblib.dump(scaler, scaler_path)
     print(f"Model saved to {model_path}")
     print(f"Scaler saved to {scaler_path}\n")
-
-
-
-
 
 def load_model_and_scaler(model_path=MODEL_PATH, scaler_path=SCALER_PATH):
     if not model_path.exists() or not scaler_path.exists():
@@ -97,16 +97,8 @@ def load_model_and_scaler(model_path=MODEL_PATH, scaler_path=SCALER_PATH):
 
 
 def predict_risk(data, use_reduced_model=False):
-    """
-    Predicts heart disease risk percentage for a single patient.
-    
-    Args:
-        data (dict): Dictionary containing patient data with keys matching FEATURE_COLUMNS
-        use_reduced_model (bool): If True, use the reduced model (6 features)
-        
-    Returns:
-        float: Risk percentage (0-100)
-    """
+    # Predicts heart disease risk percentage for a single patient.
+    #Depending on the number of features in the input data, it will use the appropriate model.
     if use_reduced_model:
         current_features = FEATURE_COLUMNS_REDUCED
         current_model_path = MODEL_PATH_REDUCED
