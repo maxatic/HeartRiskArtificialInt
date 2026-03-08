@@ -68,6 +68,24 @@ To run this project locally, ensure you have the following installed:
 - **Web Interface**: Navigate to `http://127.0.0.1:8000/predict/` to use the interactive prediction form.
 - **Doctor Dashboard**: Accessible via `/doctor-dashboard/` to manage multiple patient profiles and view their assessment history.
 
+### Test Accounts
+
+You can use the following accounts to log in and test the application:
+
+**Patients:**
+- `bestpatient@gmail.com` | Password: `123456789`
+  - *Details*: 21 yo, female, has multiple records, is assigned to a doctor (`bestdoctor@gmail.com`)
+- `worstpatient@gmail.com` | Password: `123456789`
+  - *Details*: Empty profile
+- `funnypatient@gmail.com` | Password: `123456789`
+  - *Details*: Empty profile
+
+**Doctors:**
+- `bestdoctor@gmail.com` | Password: `123456789`
+  - *Details*: Has multiple patients assigned (`bestpatient@gmail.com`, `funnypatient@gmail.com`)
+- `worstdoctor@gmail.com` | Password: `123456789`
+  - *Details*: Empty profile
+
 ##  API Endpoints (Overview)
 
 The project exposes several API endpoints for frontend integrations:
